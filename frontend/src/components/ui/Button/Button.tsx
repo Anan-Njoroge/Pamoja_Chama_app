@@ -1,16 +1,58 @@
+/**
+ * ============================================================================
+ * AppButton Component
+ * ============================================================================
+ *
+ * PURPOSE
+ * -------
+ * AppButton is the reusable button component used throughout the application.
+ *
+ * Instead of using React Native's built-in Button, every screen should use
+ * AppButton so that all buttons share the same:
+ *
+ * • Colors
+ * • Typography
+ * • Spacing
+ * • Border radius
+ * • Press animations
+ * • Accessibility
+ *
+ * FUTURE ENHANCEMENTS
+ * -------------------
+ * Future milestones will add:
+ *
+ * • Left icons
+ * • Right icons
+ * • Loading animations
+ * • Gradient buttons
+ * • Icon-only buttons
+ * ============================================================================
+ */
+
 import React from 'react';
+
 import {
-  Pressable,
   ActivityIndicator,
-  StyleSheet,
+  Pressable,
   StyleProp,
+  StyleSheet,
   ViewStyle,
 } from 'react-native';
 
 import { AppText } from '../Text';
-import { Colors } from '../../../theme';
-import { Radius } from '../../../theme';
-import { Sizes } from '../../../theme';
+
+import {
+  Colors,
+  Radius,
+  Sizes,
+  Spacing,
+} from '../../../theme';
+
+/**
+ * ============================================================================
+ * Types
+ * ============================================================================
+ */
 
 type Variant =
   | 'primary'
@@ -21,6 +63,7 @@ type Variant =
 
 interface AppButtonProps {
   title: string;
+
   onPress: () => void;
 
   variant?: Variant;
@@ -29,8 +72,21 @@ interface AppButtonProps {
 
   loading?: boolean;
 
+  /**
+   * Makes the button occupy the available width.
+   *
+   * Default: true
+   */
+  fullWidth?: boolean;
+
   style?: StyleProp<ViewStyle>;
 }
+
+/**
+ * ============================================================================
+ * Component
+ * ============================================================================
+ */
 
 export default function AppButton({
   title,
@@ -38,15 +94,9 @@ export default function AppButton({
   variant = 'primary',
   disabled = false,
   loading = false,
+  fullWidth = true,
   style,
 }: AppButtonProps) {
-  const buttonStyle = [
-    styles.button,
-    variantStyles[variant],
-    disabled && styles.disabled,
-    style,
-  ];
-
   const textColor =
     variant === 'outline'
       ? Colors.primary
@@ -54,16 +104,33 @@ export default function AppButton({
 
   return (
     <Pressable
-      style={buttonStyle}
-      onPress={onPress}
+      accessibilityRole="button"
       disabled={disabled || loading}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.button,
+
+        variantStyles[variant],
+
+        fullWidth
+          ? styles.fullWidth
+          : styles.autoWidth,
+
+        pressed && styles.pressed,
+
+        disabled && styles.disabled,
+
+        style,
+      ]}
     >
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
         <AppText
           variant="button"
-          style={{ color: textColor }}
+          style={{
+            color: textColor,
+          }}
         >
           {title}
         </AppText>
@@ -72,12 +139,39 @@ export default function AppButton({
   );
 }
 
+/**
+ * ============================================================================
+ * Styles
+ * ============================================================================
+ */
+
 const styles = StyleSheet.create({
   button: {
     height: Sizes.buttonHeight,
+
+    borderRadius: Radius.md,
+
     justifyContent: 'center',
+
     alignItems: 'center',
-    borderRadius: Radius.sm,
+
+    // Horizontal breathing room
+    paddingHorizontal: Spacing.lg,
+
+    // Prevent tiny buttons
+    minWidth: 140,
+  },
+
+  fullWidth: {
+    width: '100%',
+  },
+
+  autoWidth: {
+    alignSelf: 'flex-start',
+  },
+
+  pressed: {
+    opacity: 0.85,
   },
 
   disabled: {

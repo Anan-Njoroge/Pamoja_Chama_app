@@ -1,14 +1,28 @@
-// src/theme/sizes.ts
+/**
+ * ============================================================================
+ * Component Size Tokens
+ * ============================================================================
+ *
+ * PURPOSE
+ * -------
+ * Standard heights used by reusable components.
+ * ============================================================================
+ */
 
 export const Sizes = {
   buttonHeight: 52,
+
   inputHeight: 52,
 
-  iconSmall: 20,
-  iconMedium: 24,
-  iconLarge: 32,
+  iconSm: 16,
 
-  avatarSmall: 32,
-  avatarMedium: 48,
-  avatarLarge: 64,
+  iconMd: 24,
+
+  iconLg: 32,
+
+  avatarSm: 32,
+
+  avatarMd: 48,
+
+  avatarLg: 72,
 } as const;
