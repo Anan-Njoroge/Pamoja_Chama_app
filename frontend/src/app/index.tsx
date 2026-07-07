@@ -7,10 +7,16 @@ import { AppScreen } from '@/components/ui/Screen';
 import { AppText } from '@/components/ui/Text';
 
 import { Colors, Spacing } from '@/theme';
+import { AppHeader } from '@/components/ui/Header.tsx';
 
 export default function HomeScreen() {
   return (
     <AppScreen style={styles.container}>
+
+<AppHeader
+    title="Dashboard"
+    subtitle="Welcome back!"
+/>
 
 <AppCard
   style={{
