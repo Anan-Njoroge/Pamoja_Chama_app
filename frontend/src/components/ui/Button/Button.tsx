@@ -1,32 +1,38 @@
 /**
  * ============================================================================
- * AppButton Component
+ * AppButton
  * ============================================================================
  *
  * PURPOSE
  * -------
- * AppButton is the reusable button component used throughout the application.
+ * A reusable button component used throughout the Pamoja Chama app.
  *
- * Instead of using React Native's built-in Button, every screen should use
- * AppButton so that all buttons share the same:
+ * WHY HAVE A CUSTOM BUTTON?
+ * -------------------------
+ * React Native provides a basic <Button />, but it is difficult to style
+ * consistently across platforms.
  *
- * • Colors
- * • Typography
- * • Spacing
- * • Border radius
- * • Press animations
- * • Accessibility
+ * This component wraps Pressable and applies our design tokens so every
+ * button in the application looks and behaves consistently.
  *
- * FUTURE ENHANCEMENTS
- * -------------------
- * Future milestones will add:
+ * FEATURES
+ * --------
+ * ✓ Multiple variants
+ * ✓ Multiple sizes
+ * ✓ Optional left icon
+ * ✓ Optional right icon
+ * ✓ Loading state
+ * ✓ Disabled state
+ * ✓ Full-width or content-width
+ * ✓ Consistent spacing
  *
- * • Left icons
- * • Right icons
- * • Loading animations
- * • Gradient buttons
- * • Icon-only buttons
- * ============================================================================
+ * EXAMPLE
+ * -------
+ * <AppButton
+ *   title="Request Inventory"
+ *   leftIcon={<AppIcon name="record" color="white" />}
+ *   onPress={() => {}}
+ * />
  */
 
 import React from 'react';
@@ -36,6 +42,7 @@ import {
   Pressable,
   StyleProp,
   StyleSheet,
+  View,
   ViewStyle,
 } from 'react-native';
 
@@ -44,81 +51,153 @@ import { AppText } from '../Text';
 import {
   Colors,
   Radius,
-  Sizes,
+  Shadows,
   Spacing,
-} from '../../../theme';
+} from '@/theme';
 
-/**
- * ============================================================================
- * Types
- * ============================================================================
- */
-
-type Variant =
+export type ButtonVariant =
   | 'primary'
   | 'secondary'
   | 'success'
   | 'danger'
-  | 'outline';
+  | 'outline'
+  | 'ghost';
+
+export type ButtonSize =
+  | 'sm'
+  | 'md'
+  | 'lg';
 
 interface AppButtonProps {
   title: string;
 
   onPress: () => void;
 
-  variant?: Variant;
+  variant?: ButtonVariant;
 
-  disabled?: boolean;
+  size?: ButtonSize;
+
+  leftIcon?: React.ReactNode;
+
+  rightIcon?: React.ReactNode;
 
   loading?: boolean;
 
-  /**
-   * Makes the button occupy the available width.
-   *
-   * Default: true
-   */
+  disabled?: boolean;
+
   fullWidth?: boolean;
 
   style?: StyleProp<ViewStyle>;
 }
 
-/**
- * ============================================================================
- * Component
- * ============================================================================
- */
+const BUTTON_VARIANTS = {
+  primary: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+    textColor: Colors.white,
+    borderWidth: 0,
+  },
 
-export default function AppButton({
+  secondary: {
+    backgroundColor: Colors.primaryLight,
+    borderColor: Colors.primaryLight,
+    textColor: Colors.primary,
+    borderWidth: 0,
+  },
+
+  success: {
+    backgroundColor: Colors.success,
+    borderColor: Colors.success,
+    textColor: Colors.white,
+    borderWidth: 0,
+  },
+
+  danger: {
+    backgroundColor: Colors.danger,
+    borderColor: Colors.danger,
+    textColor: Colors.white,
+    borderWidth: 0,
+  },
+
+  outline: {
+    backgroundColor: Colors.transparent,
+    borderColor: Colors.primary,
+    textColor: Colors.primary,
+    borderWidth: 1,
+  },
+
+  ghost: {
+    backgroundColor: Colors.transparent,
+    borderColor: Colors.transparent,
+    textColor: Colors.primary,
+    borderWidth: 0,
+  },
+};
+
+const BUTTON_SIZES = {
+  sm: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    fontVariant: 'small' as const,
+  },
+
+  md: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    fontVariant: 'button' as const,
+  },
+
+  lg: {
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    fontVariant: 'button' as const,
+  },
+};
+
+export function AppButton({
   title,
   onPress,
   variant = 'primary',
-  disabled = false,
+  size = 'md',
+  leftIcon,
+  rightIcon,
   loading = false,
+  disabled = false,
   fullWidth = true,
   style,
 }: AppButtonProps) {
-  const textColor =
-    variant === 'outline'
-      ? Colors.primary
-      : Colors.white;
+  const currentVariant = BUTTON_VARIANTS[variant];
+  const currentSize = BUTTON_SIZES[size];
+
+  const textColor = disabled
+    ? Colors.disabledText
+    : currentVariant.textColor;
 
   return (
     <Pressable
-      accessibilityRole="button"
       disabled={disabled || loading}
       onPress={onPress}
+      accessibilityRole="button"
       style={({ pressed }) => [
         styles.button,
 
-        variantStyles[variant],
+        {
+          backgroundColor: disabled
+            ? Colors.disabled
+            : currentVariant.backgroundColor,
 
-        fullWidth
-          ? styles.fullWidth
-          : styles.autoWidth,
+          borderColor: currentVariant.borderColor,
 
-        pressed && styles.pressed,
+          borderWidth: currentVariant.borderWidth,
 
-        disabled && styles.disabled,
+          width: fullWidth ? '100%' : undefined,
+
+          opacity: pressed ? 0.9 : 1,
+
+          paddingVertical: currentSize.paddingVertical,
+
+          paddingHorizontal: currentSize.paddingHorizontal,
+        },
 
         style,
       ]}
@@ -126,79 +205,57 @@ export default function AppButton({
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <AppText
-          variant="button"
-          style={{
-            color: textColor,
-          }}
-        >
-          {title}
-        </AppText>
+        <View style={styles.content}>
+          {leftIcon && (
+            <View
+              style={{
+                marginRight: title ? Spacing.sm : 0,
+              }}
+            >
+              {leftIcon}
+            </View>
+          )}
+
+          <AppText
+            variant={currentSize.fontVariant}
+            style={{
+              color: textColor,
+            }}
+          >
+            {title}
+          </AppText>
+
+          {rightIcon && (
+            <View
+              style={{
+                marginLeft: title ? Spacing.sm : 0,
+              }}
+            >
+              {rightIcon}
+            </View>
+          )}
+        </View>
       )}
     </Pressable>
   );
 }
 
-/**
- * ============================================================================
- * Styles
- * ============================================================================
- */
-
 const styles = StyleSheet.create({
   button: {
-    height: Sizes.buttonHeight,
-
-    borderRadius: Radius.md,
+    borderRadius: Radius.pill,
 
     justifyContent: 'center',
 
     alignItems: 'center',
 
-    // Horizontal breathing room
-    paddingHorizontal: Spacing.lg,
-
-    // Prevent tiny buttons
-    minWidth: 140,
+    ...Shadows.sm,
   },
 
-  fullWidth: {
-    width: '100%',
-  },
+  content: {
+    flexDirection: 'row',
 
-  autoWidth: {
-    alignSelf: 'flex-start',
-  },
+    alignItems: 'center',
 
-  pressed: {
-    opacity: 0.85,
-  },
-
-  disabled: {
-    backgroundColor: Colors.disabled,
-  },
-});
-
-const variantStyles = StyleSheet.create({
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-
-  secondary: {
-    backgroundColor: Colors.primaryLight,
-  },
-
-  success: {
-    backgroundColor: Colors.success,
-  },
-
-  danger: {
-    backgroundColor: Colors.danger,
-  },
-
-  outline: {
-    backgroundColor: Colors.transparent,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
+    justifyContent: 'center',
   },
 });
