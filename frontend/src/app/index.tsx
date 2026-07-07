@@ -1,15 +1,36 @@
 import { Alert, StyleSheet } from 'react-native';
 
-import { AppScreen } from '../components/ui/Screen';
-import { AppText } from '../components/ui/Text';
-import { AppButton } from '../components/ui/Button';
-
-import { Colors } from '../theme';
+import { AppButton } from '@/components/ui/Button';
+import AppCard from '@/components/ui/Card/Card';
 import { AppInput } from '@/components/ui/Input';
+import { AppScreen } from '@/components/ui/Screen';
+import { AppText } from '@/components/ui/Text';
+
+import { Colors, Spacing } from '@/theme';
 
 export default function HomeScreen() {
   return (
     <AppScreen style={styles.container}>
+
+<AppCard
+  style={{
+    marginTop: Spacing.xl,
+  }}
+>
+  <AppText variant="h3">
+    Welcome Back 👋
+  </AppText>
+
+  <AppText
+    color="textSecondary"
+    style={{
+      marginTop: Spacing.sm,
+    }}
+  >
+    You're building the Pamoja Chama app!
+  </AppText>
+</AppCard>
+
       <AppText variant="h1" color="primary">
         Pamoja Chama
       </AppText>
