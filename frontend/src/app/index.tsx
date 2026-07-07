@@ -1,13 +1,19 @@
 import { Alert, StyleSheet } from 'react-native';
 
-import { AppButton } from '@/components/ui/Button';
-import AppCard from '@/components/ui/Card/Card';
-import { AppInput } from '@/components/ui/Input';
-import { AppScreen } from '@/components/ui/Screen';
-import { AppText } from '@/components/ui/Text';
+import { AppButton,
+  AppCard,
+  AppInput,
+  AppScreen,
+  AppText,
+  AppHeader,
+  AppIcon,
+  AppListItem,
+  AppLoadingSpinner,
+  AppFloatingActionButton,
+  AppToast,
+ } from '@/components/ui';
 
 import { Colors, Spacing } from '@/theme';
-import { AppHeader } from '@/components/ui/Header.tsx';
 
 export default function HomeScreen() {
   return (
@@ -16,6 +22,17 @@ export default function HomeScreen() {
 <AppHeader
     title="Dashboard"
     subtitle="Welcome back!"
+/>
+
+<AppButton
+  title="Request Inventory"
+  leftIcon={
+    <AppIcon
+      name="record"
+      color="white"
+    />
+  }
+  onPress={() => {}}
 />
 
 <AppCard

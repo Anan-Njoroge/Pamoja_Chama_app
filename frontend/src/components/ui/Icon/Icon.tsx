@@ -8,26 +8,26 @@
  * AppIcon is the ONLY component responsible for rendering icons
  * throughout the Pamoja Chama application.
  *
- * WHY?
- * ----
  * Instead of importing icons directly from lucide-react-native
  * everywhere in the application, we centralize them here.
  *
- * This means:
- *
- * ✓ Consistent sizing
+ * BENEFITS
+ * --------
+ * ✓ Consistent icon sizes
  * ✓ Consistent colours
- * ✓ Easier maintenance
- * ✓ Easier library replacement
+ * ✓ One place to change icon libraries in the future
+ * ✓ Semantic icon names ("home", "record", "ledger")
+ *   instead of depending on Lucide's internal names.
  *
- * Example:
+ * EXAMPLES
+ * --------
  *
  * <AppIcon name="phone" />
  *
  * <AppIcon
- *    name="review"
- *    size="lg"
- *    color="primary"
+ *   name="review"
+ *   size="lg"
+ *   color="primary"
  * />
  *
  * ============================================================================
@@ -48,7 +48,6 @@ import {
   CircleAlert,
   CircleX,
   ClipboardCheck,
-  Clock3,
   Coins,
   CreditCard,
   Eye,
@@ -77,11 +76,39 @@ import {
 
 import { Colors, ColorKey } from '@/theme';
 
-type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+/**
+ * ============================================================================
+ * Icon Sizes
+ * ============================================================================
+ *
+ * These are semantic sizes used throughout the application.
+ * Components should use these values rather than raw numbers.
+ */
+export type IconSize =
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'xxl';
 
 /**
- * These names represent the application's features,
- * NOT Lucide's icon names.
+ * ============================================================================
+ * Icon Names
+ * ============================================================================
+ *
+ * IMPORTANT
+ * ---------
+ * These are APPLICATION icon names, not Lucide icon names.
+ *
+ * For example:
+ *
+ * "home"
+ * instead of
+ * "House"
+ *
+ * This abstraction means we can replace the underlying icon library
+ * later without changing the rest of the application.
  */
 export type IconName =
   | 'home'
@@ -133,16 +160,46 @@ export type IconName =
 
   | 'more';
 
-interface AppIconProps {
+/**
+ * ============================================================================
+ * Component Props
+ * ============================================================================
+ */
+export interface AppIconProps {
+  /**
+   * Semantic icon name.
+   */
   name: IconName;
 
+  /**
+   * Theme icon size.
+   *
+   * Default: "md"
+   */
   size?: IconSize;
 
+  /**
+   * Theme colour.
+   *
+   * Must exist inside Colors.ts
+   */
   color?: ColorKey;
 
+  /**
+   * Lucide stroke width.
+   *
+   * Default: 2
+   */
   strokeWidth?: number;
 }
 
+/**
+ * ============================================================================
+ * Icon Mapping
+ * ============================================================================
+ *
+ * Maps application icon names to Lucide icons.
+ */
 const ICON_MAP: Record<IconName, LucideIcon> = {
   home: House,
   history: History,
@@ -195,7 +252,14 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   more: MoreVertical,
 };
 
-const ICON_SIZES = {
+/**
+ * ============================================================================
+ * Icon Sizes (Pixels)
+ * ============================================================================
+ *
+ * Converts semantic sizes into actual pixel values.
+ */
+const ICON_SIZES: Record<IconSize, number> = {
   xs: 14,
   sm: 16,
   md: 20,
@@ -204,6 +268,14 @@ const ICON_SIZES = {
   xxl: 40,
 };
 
+/**
+ * ============================================================================
+ * AppIcon
+ * ============================================================================
+ *
+ * Renders a Lucide icon using the application's semantic icon names,
+ * theme colours and standardised sizes.
+ */
 export function AppIcon({
   name,
   size = 'md',
@@ -211,6 +283,17 @@ export function AppIcon({
   strokeWidth = 2,
 }: AppIconProps) {
   const Icon = ICON_MAP[name];
+
+  /**
+   * Safety fallback.
+   *
+   * This should never happen because TypeScript ensures `name`
+   * is a valid IconName, but this protects against unexpected
+   * runtime values.
+   */
+  if (!Icon) {
+    return null;
+  }
 
   return (
     <Icon
