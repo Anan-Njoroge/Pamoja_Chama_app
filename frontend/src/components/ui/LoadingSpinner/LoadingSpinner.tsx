@@ -35,6 +35,7 @@ import { AppText } from '../Text';
 
 import {
   Colors,
+  ColorKey,
   Spacing,
 } from '@/theme';
 
@@ -44,7 +45,7 @@ export type LoadingSize =
   | 'small'
   | 'large';
 
-interface AppLoadingSpinnerProps {
+export interface AppLoadingSpinnerProps extends ViewComponentProps{
 
   /**
    * Optional loading message.
@@ -64,18 +65,17 @@ interface AppLoadingSpinnerProps {
   /**
    * Optional custom styling.
    */
-  style?: StyleProp<ViewStyle>;
+  spinnerColor?: ColorKey;
 
-  /**
-   * Used for testing.
-   */
-  testID?: string;
-}
+  labelColor?: ColorKey;
+  }
 
 export function AppLoadingSpinner({
   label,
   size = 'large',
   fullScreen = false,
+  spinnerColor = 'primary',
+  labelColor = 'textSecondary',
   style,
   testID,
 }: AppLoadingSpinnerProps) {
@@ -95,15 +95,15 @@ export function AppLoadingSpinner({
 
       <ActivityIndicator
         size={size}
-        color={Colors.primary}
+        color={Colors[spinnerColor]}
       />
 
       {label && (
 
         <AppText
           variant="small"
-          color="textSecondary"
           style={styles.label}
+          color={labelColor}
         >
           {label}
         </AppText>
