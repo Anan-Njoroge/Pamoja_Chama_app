@@ -10,4 +10,4 @@
  * ============================================================================
  */
 
-export { default as AppCard } from './Card';
+export { AppCard } from './Card';

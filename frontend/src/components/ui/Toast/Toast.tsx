@@ -35,17 +35,16 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import {
-  AppCard,
-  AppIcon,
-  AppText,
-  type IconName,
-} from '@/components/ui';
+
+import { AppCard } from '../Card';
+import { AppText } from '../Text';
+import { AppIcon, type IconName } from '../Icon';
 
 import {
   Colors,
   Spacing,
 } from '@/theme';
+
 
 export type ToastVariant =
   | 'success'

@@ -54,6 +54,8 @@ import {
   Shadows,
   Spacing,
 } from '@/theme';
+import { IconName } from '../Icon';
+import { PressableComponentProps } from '@/types/component';
 
 export type ButtonVariant =
   | 'primary'
@@ -68,26 +70,22 @@ export type ButtonSize =
   | 'md'
   | 'lg';
 
-interface AppButtonProps {
-  title: string;
+  export interface AppButtonProps
+  extends PressableComponentProps {
 
-  onPress: () => void;
+  title: string;
 
   variant?: ButtonVariant;
 
   size?: ButtonSize;
 
-  leftIcon?: React.ReactNode;
+  leftIcon?: IconName;
 
-  rightIcon?: React.ReactNode;
+  rightIcon?: IconName;
 
   loading?: boolean;
 
-  disabled?: boolean;
-
   fullWidth?: boolean;
-
-  style?: StyleProp<ViewStyle>;
 }
 
 const BUTTON_VARIANTS = {
@@ -242,7 +240,7 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: Radius.pill,
+    borderRadius: Radius.full,
 
     justifyContent: 'center',
 

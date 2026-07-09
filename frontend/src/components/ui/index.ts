@@ -47,3 +47,4 @@ export * from './EmptyState';
 export * from './LoadingSpinner';
 export * from './FloatingActionButton';
 export * from './Toast';
+export * from './Divider';

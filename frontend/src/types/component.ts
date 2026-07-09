@@ -3,31 +3,34 @@
  * Shared Component Types
  * ============================================================================
  *
- * These interfaces define common props shared across reusable UI
- * components.
+ * Common interfaces used across the application's reusable components.
  *
- * Instead of repeating:
+ * WHY?
+ * ----
+ * Many components share the same props:
  *
- * style?
- * testID?
+ * • style
+ * • testID
+ * • accessibilityLabel
+ * • accessibilityHint
  *
- * in every component, we define them once here.
+ * Rather than redefining these everywhere, we define them once here.
  *
  * ============================================================================
  */
 
-import {
+import type {
   StyleProp,
   TextStyle,
   ViewStyle,
 } from 'react-native';
 
 export interface BaseComponentProps {
-
-  /**
-   * Used for automated testing.
-   */
   testID?: string;
+
+  accessibilityLabel?: string;
+
+  accessibilityHint?: string;
 }
 
 export interface ViewComponentProps
@@ -40,4 +43,22 @@ export interface TextComponentProps
   extends BaseComponentProps {
 
   style?: StyleProp<TextStyle>;
+}
+
+/**
+ * Shared by components that can be disabled.
+ */
+export interface Disableable {
+
+  disabled?: boolean;
+}
+
+/**
+ * Shared by components that react to a press.
+ */
+export interface PressableComponentProps
+  extends ViewComponentProps,
+    Disableable {
+
+  onPress: () => void;
 }

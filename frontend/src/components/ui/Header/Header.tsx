@@ -53,6 +53,8 @@ import {
   Spacing,
 } from '@/theme';
 
+import type { ViewComponentProps } from '@/types';
+
 interface HeaderAction {
   icon: React.ReactNode;
 

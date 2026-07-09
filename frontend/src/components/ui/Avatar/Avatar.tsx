@@ -45,6 +45,8 @@ import {
   Spacing,
 } from '@/theme';
 
+import type { ViewComponentProps } from '@/types';
+
 export type AvatarSize =
   | 'xs'
   | 'sm'
@@ -62,7 +64,7 @@ export type AvatarRole =
   | 'treasurer'
   | 'admin';
 
-interface AppAvatarProps {
+interface AppAvatarProps extends ViewComponentProps {
 
   /**
    * Full name.

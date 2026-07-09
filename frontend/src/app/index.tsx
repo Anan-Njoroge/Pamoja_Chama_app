@@ -11,6 +11,7 @@ import { AppButton,
   AppLoadingSpinner,
   AppFloatingActionButton,
   AppToast,
+  AppDivider,
  } from '@/components/ui';
 
 import { Colors, Spacing } from '@/theme';
@@ -22,17 +23,6 @@ export default function HomeScreen() {
 <AppHeader
     title="Dashboard"
     subtitle="Welcome back!"
-/>
-
-<AppButton
-  title="Request Inventory"
-  leftIcon={
-    <AppIcon
-      name="record"
-      color="white"
-    />
-  }
-  onPress={() => {}}
 />
 
 <AppCard

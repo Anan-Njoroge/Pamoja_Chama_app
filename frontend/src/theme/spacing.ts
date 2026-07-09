@@ -1,42 +1,43 @@
 /**
  * ============================================================================
- * Spacing Design Tokens
+ * Spacing Tokens
  * ============================================================================
  *
  * PURPOSE
  * -------
  * Defines the spacing scale used throughout the application.
  *
- * Never use raw numbers like:
+ * Components should use these semantic values instead of hardcoded numbers.
  *
- *    margin: 16
- *    padding: 24
+ * Example:
  *
- * Instead use:
+ * padding: Spacing.md
+ * marginBottom: Spacing.lg
  *
- *    margin: Spacing.md
- *    padding: Spacing.lg
- *
- * This ensures consistency across every screen.
  * ============================================================================
  */
 
 export const Spacing = {
-  none: 0,
 
-  xxs: 2,
+  none: 0,
 
   xs: 4,
 
   sm: 8,
 
-  md: 16,
+  md: 12,
 
-  lg: 24,
+  lg: 16,
 
-  xl: 32,
+  xl: 24,
 
-  xxl: 48,
+  xxl: 32,
 
-  xxxl: 64,
+  xxxl: 40,
+
 } as const;
+
+/**
+ * Semantic spacing keys.
+ */
+export type SpacingKey = keyof typeof Spacing;

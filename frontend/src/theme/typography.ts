@@ -19,6 +19,13 @@ export const Typography = {
     fontWeight: '600' as const,
   },
 
+  // ⭐ Added
+  title: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600' as const,
+  },
+
   body: {
     fontSize: 16,
     lineHeight: 24,
@@ -43,3 +50,5 @@ export const Typography = {
     fontWeight: '600' as const,
   },
 } as const;
+
+export type TypographyKey = keyof typeof Typography;

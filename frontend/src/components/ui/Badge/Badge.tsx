@@ -47,6 +47,8 @@ import {
   Spacing,
 } from '@/theme';
 
+import type { ViewComponentProps } from '@/types';
+
 export type BadgeVariant =
   | 'primary'
   | 'success'
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
 
     alignSelf: 'flex-start',
 
-    borderRadius: Radius.pill,
+    borderRadius: Radius.full,
 
     borderWidth: 1,
   },

@@ -8,27 +8,35 @@
  * AppIcon is the ONLY component responsible for rendering icons
  * throughout the Pamoja Chama application.
  *
- * Instead of importing icons directly from lucide-react-native
+ * WHY?
+ * ----
+ * Instead of importing icons directly from `lucide-react-native`
  * everywhere in the application, we centralize them here.
  *
- * BENEFITS
- * --------
+ * This gives us:
+ *
  * ✓ Consistent icon sizes
  * ✓ Consistent colours
- * ✓ One place to change icon libraries in the future
- * ✓ Semantic icon names ("home", "record", "ledger")
- *   instead of depending on Lucide's internal names.
+ * ✓ Semantic icon names
+ * ✓ Easier maintenance
+ * ✓ One place to replace the icon library later
  *
- * EXAMPLES
- * --------
+ * ----------------------------------------------------------------------------
+ * DESIGN PRINCIPLE
+ * ----------------------------------------------------------------------------
  *
- * <AppIcon name="phone" />
+ * Components should NEVER depend directly on Lucide icon names.
  *
- * <AppIcon
- *   name="review"
- *   size="lg"
- *   color="primary"
- * />
+ * Good:
+ *
+ *     <AppIcon name="record" />
+ *
+ * Bad:
+ *
+ *     <WalletCards />
+ *
+ * The application should describe WHAT the icon represents,
+ * not WHICH icon library provides it.
  *
  * ============================================================================
  */
@@ -38,6 +46,8 @@ import React from 'react';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUpDown,
+  Banknote,
   Bell,
   BookOpenText,
   Calendar,
@@ -49,32 +59,54 @@ import {
   CircleX,
   ClipboardCheck,
   Coins,
+  Copy,
   CreditCard,
+  Download,
   Eye,
   EyeOff,
   FileText,
   FolderOpen,
   History,
   House,
+  Info,
+  Landmark,
   Lock,
+  Menu,
+  Minus,
   MoreVertical,
+  Paperclip,
+  Pencil,
   Phone,
   Plus,
   Receipt,
+  Save,
   Search,
   Settings,
+  Share2,
+  SlidersHorizontal,
+  Trash2,
   TrendingDown,
   TrendingUp,
+  Upload,
   UserMinus,
   UserPlus,
   UserRound,
   Users,
   Wallet,
   WalletCards,
-  type LucideIcon,
+  X,
 } from 'lucide-react-native';
 
-import { Colors, ColorKey } from '@/theme';
+import type {
+  LucideIcon,
+} from 'lucide-react-native';
+
+import { Colors } from '@/theme';
+
+import type {
+  ColorKey,
+} from '@/theme';
+
 
 /**
  * ============================================================================
@@ -82,8 +114,18 @@ import { Colors, ColorKey } from '@/theme';
  * ============================================================================
  *
  * These are semantic sizes used throughout the application.
- * Components should use these values rather than raw numbers.
+ *
+ * Instead of:
+ *
+ * size={21}
+ *
+ * we write:
+ *
+ * size="md"
+ *
+ * This ensures consistency throughout the application.
  */
+
 export type IconSize =
   | 'xs'
   | 'sm'
@@ -99,18 +141,18 @@ export type IconSize =
  *
  * IMPORTANT
  * ---------
- * These are APPLICATION icon names, not Lucide icon names.
  *
- * For example:
+ * These are APPLICATION icon names.
  *
- * "home"
- * instead of
- * "House"
+ * They are intentionally independent from Lucide's names.
  *
- * This abstraction means we can replace the underlying icon library
- * later without changing the rest of the application.
+ * If we ever replace Lucide,
+ * only ICON_MAP changes.
  */
+
 export type IconName =
+
+  // Navigation
   | 'home'
   | 'history'
   | 'group'
@@ -120,75 +162,147 @@ export type IconName =
   | 'record'
   | 'ledger'
 
+  | 'back'
+  | 'forward'
+
+  | 'arrow-left'
+  | 'arrow-right'
+
+  | 'chevron-left'
+  | 'chevron-right'
+
+  | 'menu'
+  | 'more'
+
+  // Search
+  | 'search'
+  | 'filter'
+  | 'sort'
+  | 'close'
+
+  // Forms
   | 'phone'
   | 'lock'
+  | 'calendar'
   | 'eye'
   | 'eye-off'
 
-  | 'search'
-  | 'calendar'
-  | 'settings'
+  | 'edit'
+  | 'save'
 
-  | 'plus'
-
-  | 'notification'
-
+  // Finance
   | 'wallet'
   | 'coins'
   | 'credit-card'
   | 'receipt'
+  | 'money'
+  | 'bank'
 
+  // Members
   | 'member-add'
   | 'member-remove'
 
+  // Files
   | 'folder'
   | 'document'
+  | 'download'
+  | 'upload'
+  | 'attachment'
 
+  // Status
   | 'success'
   | 'warning'
   | 'error'
+  | 'info'
 
-  | 'arrow-left'
-  | 'arrow-right'
-  | 'chevron-left'
-  | 'chevron-right'
+  // Actions
+  | 'plus'
+  | 'minus'
+  | 'delete'
+  | 'share'
+  | 'copy'
 
+  // Analytics
+  | 'chart'
   | 'trending-up'
   | 'trending-down'
 
-  | 'chart'
+  // Notifications
+  | 'notification'
+  | 'settings';
 
-  | 'more';
+/**
+ * ============================================================================
+ * Icon Tone
+ * ============================================================================
+ *
+ * Instead of asking:
+ *
+ * "What colour should this icon be?"
+ *
+ * we ask:
+ *
+ * "What does this icon represent?"
+ *
+ * Example:
+ *
+ * tone="warning"
+ *
+ * instead of
+ *
+ * color="pending"
+ *
+ * This separates DESIGN from BUSINESS LOGIC.
+ */
+
+export type IconTone =
+  | 'default'
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'muted';
 
 /**
  * ============================================================================
  * Component Props
  * ============================================================================
  */
+
 export interface AppIconProps {
+
   /**
-   * Semantic icon name.
+   * Semantic application icon.
    */
   name: IconName;
 
   /**
-   * Theme icon size.
+   * Semantic size.
    *
-   * Default: "md"
+   * Default: md
    */
   size?: IconSize;
 
   /**
-   * Theme colour.
+   * Explicit colour.
    *
-   * Must exist inside Colors.ts
+   * NOTE:
+   * -----
+   * If both colour and tone are supplied,
+   * colour always wins.
+   *
+   * In most situations,
+   * prefer using tone.
    */
   color?: ColorKey;
 
   /**
+   * Semantic colour.
+   */
+  tone?: IconTone;
+
+  /**
    * Lucide stroke width.
-   *
-   * Default: 2
    */
   strokeWidth?: number;
 }
@@ -198,9 +312,14 @@ export interface AppIconProps {
  * Icon Mapping
  * ============================================================================
  *
- * Maps application icon names to Lucide icons.
+ * This is the ONLY place that knows
+ * about Lucide.
  */
+
 const ICON_MAP: Record<IconName, LucideIcon> = {
+
+  // Navigation
+
   home: House,
   history: History,
   group: Users,
@@ -210,33 +329,8 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   record: WalletCards,
   ledger: BookOpenText,
 
-  phone: Phone,
-  lock: Lock,
-  eye: Eye,
-  'eye-off': EyeOff,
-
-  search: Search,
-  calendar: Calendar,
-  settings: Settings,
-
-  plus: Plus,
-
-  notification: Bell,
-
-  wallet: Wallet,
-  coins: Coins,
-  'credit-card': CreditCard,
-  receipt: Receipt,
-
-  'member-add': UserPlus,
-  'member-remove': UserMinus,
-
-  folder: FolderOpen,
-  document: FileText,
-
-  success: CheckCircle2,
-  warning: CircleAlert,
-  error: CircleX,
+  back: ArrowLeft,
+  forward: ArrowRight,
 
   'arrow-left': ArrowLeft,
   'arrow-right': ArrowRight,
@@ -244,28 +338,147 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   'chevron-left': ChevronLeft,
   'chevron-right': ChevronRight,
 
+  menu: Menu,
+  more: MoreVertical,
+
+  // Search
+
+  search: Search,
+  filter: SlidersHorizontal,
+  sort: ArrowUpDown,
+  close: X,
+
+  // Forms
+
+  phone: Phone,
+  lock: Lock,
+  calendar: Calendar,
+
+  eye: Eye,
+  'eye-off': EyeOff,
+
+  edit: Pencil,
+  save: Save,
+
+  // Finance
+
+  wallet: Wallet,
+  coins: Coins,
+  'credit-card': CreditCard,
+  receipt: Receipt,
+
+  money: Banknote,
+  bank: Landmark,
+
+  // Members
+
+  'member-add': UserPlus,
+  'member-remove': UserMinus,
+
+  // Files
+
+  folder: FolderOpen,
+  document: FileText,
+
+  download: Download,
+  upload: Upload,
+
+  attachment: Paperclip,
+
+  // Status
+
+  success: CheckCircle2,
+  warning: CircleAlert,
+  error: CircleX,
+  info: Info,
+
+  // Actions
+
+  plus: Plus,
+  minus: Minus,
+
+  delete: Trash2,
+
+  share: Share2,
+  copy: Copy,
+
+  // Analytics
+
+  chart: ChartColumn,
   'trending-up': TrendingUp,
   'trending-down': TrendingDown,
 
-  chart: ChartColumn,
+  // Notifications
 
-  more: MoreVertical,
+  notification: Bell,
+  settings: Settings,
 };
 
 /**
  * ============================================================================
- * Icon Sizes (Pixels)
+ * Icon Size Map
  * ============================================================================
  *
  * Converts semantic sizes into actual pixel values.
+ *
+ * Components should never hardcode pixel values.
+ *
+ * Instead of:
+ *
+ *    <AppIcon size={24} />
+ *
+ * use:
+ *
+ *    <AppIcon size="lg" />
+ *
+ * If the design system changes in the future,
+ * we only update these values.
+ * ============================================================================
  */
-const ICON_SIZES: Record<IconSize, number> = {
+
+const ICON_SIZE_MAP = {
   xs: 14,
   sm: 16,
   md: 20,
   lg: 24,
   xl: 32,
   xxl: 40,
+} as const;
+
+/**
+ * ============================================================================
+ * Icon Tone Map
+ * ============================================================================
+ *
+ * Maps semantic tones to theme colours.
+ *
+ * The goal is to express intent instead of implementation.
+ *
+ * Example:
+ *
+ *    tone="success"
+ *
+ * instead of
+ *
+ *    color="success"
+ *
+ * This keeps the UI consistent and allows us to change
+ * the application's colour palette in one place.
+ * ============================================================================
+ */
+
+const ICON_TONE_MAP: Record<IconTone, ColorKey> = {
+  default: 'textPrimary',
+
+  primary: 'primary',
+
+  success: 'success',
+
+  warning: 'pending',
+
+  danger: 'danger',
+
+  muted: 'textPlaceholder',
 };
 
 /**
@@ -273,33 +486,85 @@ const ICON_SIZES: Record<IconSize, number> = {
  * AppIcon
  * ============================================================================
  *
- * Renders a Lucide icon using the application's semantic icon names,
- * theme colours and standardised sizes.
+ * AppIcon is a lightweight wrapper around Lucide icons.
+ *
+ * Responsibilities
+ * ----------------
+ *
+ * ✓ Render the correct icon
+ *
+ * ✓ Apply semantic sizing
+ *
+ * ✓ Apply semantic colouring
+ *
+ * ✓ Keep the rest of the application independent from Lucide
+ *
+ * ============================================================================
  */
+
 export function AppIcon({
   name,
+
   size = 'md',
-  color = 'textPrimary',
+
+  color,
+
+  tone = 'default',
+
   strokeWidth = 2,
 }: AppIconProps) {
+
+  /**
+   * Retrieve the matching Lucide icon.
+   */
   const Icon = ICON_MAP[name];
 
   /**
-   * Safety fallback.
+   * This should never happen because
+   * TypeScript guarantees valid icon names.
    *
-   * This should never happen because TypeScript ensures `name`
-   * is a valid IconName, but this protects against unexpected
+   * The guard simply protects against unexpected
    * runtime values.
    */
   if (!Icon) {
     return null;
   }
 
+  /**
+   * Resolve the icon colour.
+   *
+   * Priority
+   * --------
+   *
+   * 1. Explicit colour
+   * 2. Semantic tone
+   */
+
+  const resolvedColor = color
+    ? Colors[color]
+    : Colors[ICON_TONE_MAP[tone]];
+
   return (
     <Icon
-      size={ICON_SIZES[size]}
-      color={Colors[color]}
+      size={ICON_SIZE_MAP[size]}
+      color={resolvedColor}
       strokeWidth={strokeWidth}
     />
   );
 }
+
+/**
+ * Helps React DevTools display a friendly component name.
+ */
+
+AppIcon.displayName = 'AppIcon';
+
+/**
+ * ============================================================================
+ * Exports
+ * ============================================================================
+ */
+
+export type {
+  ColorKey,
+};

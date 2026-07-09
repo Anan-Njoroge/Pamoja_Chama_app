@@ -1,1 +1,1 @@
-export { default as AppScreen } from './Screen';
+export { AppScreen } from './Screen';

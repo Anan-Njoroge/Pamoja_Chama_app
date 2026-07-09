@@ -31,40 +31,21 @@ import {
 import {
   AppIcon,
   type IconName,
-} from '@/components/ui';
+} from '../Icon';
 
 import {
   Colors,
   Shadows,
   Spacing,
 } from '@/theme';
+import { PressableComponentProps } from '@/types/component';
 
-export interface AppFloatingActionButtonProps {
+import type { ViewComponentProps } from '@/types';
 
-  /**
-   * Icon displayed inside the FAB.
-   */
+export interface AppFloatingActionButtonProps
+  extends PressableComponentProps {
+
   icon?: IconName;
-
-  /**
-   * Called when the FAB is pressed.
-   */
-  onPress: () => void;
-
-  /**
-   * Disable interactions.
-   */
-  disabled?: boolean;
-
-  /**
-   * Override default positioning.
-   */
-  style?: StyleProp<ViewStyle>;
-
-  /**
-   * Used for testing.
-   */
-  testID?: string;
 }
 
 export function AppFloatingActionButton({

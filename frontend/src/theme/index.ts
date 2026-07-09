@@ -1,15 +1,9 @@
 /**
  * ============================================================================
- * Theme Entry Point
+ * Theme
  * ============================================================================
  *
- * PURPOSE
- * -------
- * Provides a single import location for the application's design tokens.
- *
- * Example:
- *
- * import { Colors, Spacing } from '@/theme';
+ * Single entry point for the application's design system.
  *
  * ============================================================================
  */
@@ -17,6 +11,11 @@
 export * from './colors';
 export * from './spacing';
 export * from './radius';
+export * from './shadows';
 export * from './typography';
 export * from './sizes';
-export * from './shadows';
+
+/**
+ * Theme types.
+ */
+export * from './types';

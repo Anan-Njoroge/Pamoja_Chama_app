@@ -57,6 +57,8 @@ import {
   Spacing,
 } from '@/theme';
 
+import type { PressableComponentProps } from '@/types';
+
 export interface AppListItemProps {
 
   /**

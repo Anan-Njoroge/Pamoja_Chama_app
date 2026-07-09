@@ -30,17 +30,16 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import {
-  AppButton,
-  AppIcon,
-  AppText,
-  type IconName,
-} from '@/components/ui';
+import { AppButton } from '../Button';
+import { AppIcon, type IconName } from '../Icon';
+import { AppText } from '../Text';
 
 import {
   Colors,
   Spacing,
 } from '@/theme';
+
+import type { ViewComponentProps } from '@/types';
 
 interface AppEmptyStateProps {
 

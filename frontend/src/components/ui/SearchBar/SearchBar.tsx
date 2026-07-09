@@ -5,151 +5,222 @@
  *
  * PURPOSE
  * -------
- * A reusable search component used throughout the Pamoja Chama app.
+ * AppSearchBar provides a consistent search input throughout the
+ * Pamoja Chama application.
  *
- * Unlike AppInput, this component is specifically designed for searching
- * lists of members, transactions, payments, notifications and reports.
+ * WHY?
+ * ----
+ * Many screens need search functionality:
+ *
+ * • Members
+ * • Transactions
+ * • Notifications
+ * • Loan requests
+ * • Inventory
+ *
+ * Instead of styling a TextInput every time, this component provides
+ * a single reusable implementation.
  *
  * FEATURES
  * --------
  * ✓ Search icon
- * ✓ Clear button
- * ✓ Loading indicator
- * ✓ Controlled component
- * ✓ Focus styling
- * ✓ Disabled state
- * ✓ Optional filter button
- *
- * EXAMPLE
- * -------
- *
- * <AppSearchBar
- *   value={search}
- *   onChangeText={setSearch}
- *   placeholder="Search members..."
- * />
+ * ✓ Optional clear button
+ * ✓ Placeholder
+ * ✓ Native TextInput props
+ * ✓ Accessibility
+ * ✓ Theme integration
  *
  * ============================================================================
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
-  ActivityIndicator,
   Pressable,
-  StyleProp,
   StyleSheet,
   TextInput,
-  TextInputProps,
+  type TextInputProps,
   View,
-  ViewStyle,
 } from 'react-native';
 
 import {
   Colors,
   Radius,
-  Shadows,
   Spacing,
 } from '@/theme';
 
-import { AppIcon } from '../Icon';
+import type { ViewComponentProps } from '@/types';
 
-interface AppSearchBarProps
-  extends Omit<TextInputProps, 'style'> {
+import {
+  AppIcon,
+  type IconName,
+} from '../Icon';
 
-  loading?: boolean;
+export interface AppSearchBarProps
+  extends Omit<TextInputProps, 'style'>,
+    ViewComponentProps {
 
-  disabled?: boolean;
+  /**
+   * Optional icon shown on the left.
+   *
+   * Defaults to the search icon.
+   */
+  leftIcon?: IconName;
 
+  /**
+   * Optional icon shown on the right.
+   *
+   * Example:
+   * filter
+   * microphone
+   */
+  rightIcon?: IconName;
+
+  /**
+   * Called when the right icon is pressed.
+   */
+  onRightIconPress?: () => void;
+
+  /**
+   * Whether to show the built-in clear button.
+   */
   showClearButton?: boolean;
-
-  showFilterButton?: boolean;
-
-  onFilterPress?: () => void;
-
-  style?: StyleProp<ViewStyle>;
 }
 
 export function AppSearchBar({
+
   value,
+
   onChangeText,
+
   placeholder = 'Search...',
-  loading = false,
-  disabled = false,
+
+  editable = true,
+
+  leftIcon = 'search',
+
+  rightIcon,
+
+  onRightIconPress,
+
   showClearButton = true,
-  showFilterButton = false,
-  onFilterPress,
+
   style,
+
+  testID,
+
+  accessibilityLabel = 'Search',
+
+  accessibilityHint,
+
   ...props
+
 }: AppSearchBarProps) {
 
-  const [focused, setFocused] = useState(false);
+  const hasText = Boolean(value?.length);
 
   return (
+
     <View
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       style={[
         styles.container,
-
-        focused && styles.focused,
-
-        disabled && styles.disabled,
-
         style,
       ]}
     >
+
+      {/* Left Search Icon */}
+
       <AppIcon
-        name="search"
+        name={leftIcon}
+        size="md"
         color="textPlaceholder"
       />
 
+      {/* Search Input */}
+
       <TextInput
-        {...props}
-        value={value}
-        editable={!disabled}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={Colors.textPlaceholder}
+
         style={styles.input}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+
+        value={value}
+
+        editable={editable}
+
+        placeholder={placeholder}
+
+        placeholderTextColor={Colors.textPlaceholder}
+
+        onChangeText={onChangeText}
+
+        returnKeyType="search"
+
+        autoCorrect={false}
+
+        autoCapitalize="none"
+
+        {...props}
+
       />
 
-      {loading && (
-        <ActivityIndicator
-          size="small"
-          color={Colors.primary}
-        />
+      {/* Clear Button */}
+
+      {showClearButton && hasText && (
+
+        <Pressable
+
+          onPress={() => onChangeText?.('')}
+
+          accessibilityRole="button"
+
+          accessibilityLabel="Clear search"
+
+        >
+
+          <AppIcon
+            name="error"
+            size="sm"
+            color="textPlaceholder"
+          />
+
+        </Pressable>
+
       )}
 
-      {!loading &&
-        !!value &&
-        showClearButton && (
-          <Pressable
-            hitSlop={10}
-            onPress={() => onChangeText?.('')}
-          >
-            <AppIcon
-              name="error"
-              color="textPlaceholder"
-              size="sm"
-            />
-          </Pressable>
-        )}
+      {/* Optional Right Icon */}
 
-      {!loading &&
-        showFilterButton && (
-          <Pressable
-            hitSlop={10}
-            onPress={onFilterPress}
-          >
-            <AppIcon
-              name="more"
-              color="primary"
-            />
-          </Pressable>
-        )}
+      {!hasText && rightIcon && (
+
+        <Pressable
+
+          onPress={onRightIconPress}
+
+          accessibilityRole="button"
+
+          accessibilityLabel="Search action"
+
+        >
+
+          <AppIcon
+
+            name={rightIcon}
+
+            size="md"
+
+            color="textSecondary"
+
+          />
+
+        </Pressable>
+
+      )}
+
     </View>
+
   );
+
 }
 
 const styles = StyleSheet.create({
@@ -162,38 +233,30 @@ const styles = StyleSheet.create({
 
     backgroundColor: Colors.white,
 
-    borderRadius: Radius.pill,
-
     borderWidth: 1,
 
     borderColor: Colors.border,
 
+    borderRadius: Radius.full,
+
     paddingHorizontal: Spacing.md,
 
-    minHeight: 52,
+    minHeight: 48,
 
-    ...Shadows.sm,
-  },
+    gap: Spacing.sm,
 
-  focused: {
-
-    borderColor: Colors.primary,
-  },
-
-  disabled: {
-
-    opacity: 0.6,
   },
 
   input: {
 
     flex: 1,
 
-    marginHorizontal: Spacing.sm,
-
     fontSize: 16,
 
     color: Colors.textPrimary,
+
+    paddingVertical: Spacing.sm,
+
   },
 
 });

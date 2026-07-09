@@ -1,95 +1,93 @@
 /**
  * ============================================================================
- * AppInput Component
+ * AppInput
  * ============================================================================
  *
- * PURPOSE
- * -------
- * AppInput is the application's reusable text input component.
+ * Reusable text input for the entire application.
  *
- * Instead of using React Native's TextInput directly on every screen,
- * every form in the application should use AppInput.
+ * Every form should use AppInput instead of React Native's TextInput.
  *
- * This ensures:
+ * Future enhancements:
  *
- * • Consistent styling
- * • Consistent spacing
- * • Consistent typography
- * • Centralized maintenance
- *
- * FUTURE ENHANCEMENTS
- * -------------------
- * This component is intentionally designed to grow with the application.
- * Later milestones will add:
- *
- * • Left and right icons
- * • Phone number formatting
- * • Password visibility toggle
- * • Input masking
- * • Character counter
- * • Validation states
- *
- * USED BY
- * -------
- * - Login Screen
- * - Registration
- * - Create Chama
- * - Join Chama
- * - Profile
- * - Payments
+ * ✓ Left icon
+ * ✓ Right icon
+ * ✓ Password toggle
+ * ✓ Phone formatting
+ * ✓ Validation
+ * ✓ Character counter
  * ============================================================================
  */
 
 import React from 'react';
 
 import {
+  StyleProp,
   StyleSheet,
   TextInput,
   TextInputProps,
+  TextStyle,
   View,
 } from 'react-native';
 
 import { AppText } from '../Text';
 
+import type { IconName } from '../Icon';
+
 import {
   Colors,
   Radius,
-  Sizes,
   Spacing,
-} from '../../../theme';
+  Typography,
+} from '@/theme';
 
-/**
- * ============================================================================
- * Props
- * ============================================================================
- */
+import type { ViewComponentProps } from '@/types';
 
-interface AppInputProps extends TextInputProps {
+export interface AppInputProps
+  extends Omit<TextInputProps, 'style'> {
+
   /**
-   * Label displayed above the input.
+   * Optional label shown above the field.
    */
   label?: string;
 
   /**
-   * Optional validation error.
+   * Validation error.
    */
   error?: string;
+
+  /**
+   * Helper text shown below the field.
+   */
+  helperText?: string;
+
+  /**
+   * Reserved for future implementation.
+   */
+  leftIcon?: IconName;
+
+  /**
+   * Reserved for future implementation.
+   */
+  rightIcon?: IconName;
+
+  /**
+   * TextInput style.
+   */
+  style?: StyleProp<TextStyle>;
 }
 
-/**
- * ============================================================================
- * Component
- * ============================================================================
- */
-
-export default function AppInput({
+export function AppInput({
   label,
   error,
+  helperText,
   style,
   ...props
 }: AppInputProps) {
+
   return (
+
     <View style={styles.container}>
+
       {label && (
         <AppText
           variant="small"
@@ -101,35 +99,43 @@ export default function AppInput({
       )}
 
       <TextInput
+        {...props}
+        placeholderTextColor={Colors.textPlaceholder}
         style={[
           styles.input,
           error && styles.inputError,
           style,
         ]}
-        placeholderTextColor={Colors.textPlaceholder}
-        {...props}
       />
 
-      {error && (
+      {error ? (
         <AppText
           variant="caption"
           color="danger"
-          style={styles.error}
+          style={styles.message}
         >
           {error}
         </AppText>
-      )}
+      ) : helperText ? (
+        <AppText
+          variant="caption"
+          color="textSecondary"
+          style={styles.message}
+        >
+          {helperText}
+        </AppText>
+      ) : null}
+
     </View>
+
   );
+
 }
 
-/**
- * ============================================================================
- * Styles
- * ============================================================================
- */
+AppInput.displayName = 'AppInput';
 
 const styles = StyleSheet.create({
+
   container: {
     width: '100%',
     marginBottom: Spacing.md,
@@ -140,28 +146,30 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    height: Sizes.inputHeight,
+    height: 52,
+
+    paddingHorizontal: Spacing.md,
 
     borderWidth: 1,
-
     borderColor: Colors.border,
 
     borderRadius: Radius.md,
-
-    paddingHorizontal: Spacing.md,
 
     backgroundColor: Colors.white,
 
     color: Colors.textPrimary,
 
-    fontSize: 16,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
+    fontWeight: Typography.body.fontWeight,
   },
 
   inputError: {
     borderColor: Colors.danger,
   },
 
-  error: {
+  message: {
     marginTop: Spacing.xs,
   },
+
 });

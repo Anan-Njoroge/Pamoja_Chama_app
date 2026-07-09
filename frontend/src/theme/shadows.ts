@@ -5,43 +5,91 @@
  *
  * PURPOSE
  * -------
- * Standard shadow presets for cards, modals, and floating elements.
+ * Defines reusable elevation styles for the entire application.
  *
- * Android uses elevation while iOS uses shadow properties.
+ * React Native handles shadows differently on iOS and Android.
+ *
+ * Android:
+ * elevation
+ *
+ * iOS:
+ * shadowColor
+ * shadowOpacity
+ * shadowRadius
+ * shadowOffset
+ *
  * ============================================================================
  */
 
-export const Shadows = {
+import { ViewStyle } from 'react-native';
+
+export const Shadows: Record<
+  'none' | 'sm' | 'md' | 'lg' | 'xl',
+  ViewStyle
+> = {
+
+  none: {},
+
   sm: {
     shadowColor: '#000',
+
     shadowOpacity: 0.08,
-    shadowRadius: 2,
+
+    shadowRadius: 3,
+
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
+
     elevation: 2,
   },
 
   md: {
     shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
+
+    shadowOpacity: 0.10,
+
+    shadowRadius: 6,
+
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
+
     elevation: 4,
   },
 
   lg: {
     shadowColor: '#000',
-    shadowOpacity: 0.16,
-    shadowRadius: 8,
+
+    shadowOpacity: 0.14,
+
+    shadowRadius: 10,
+
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 5,
     },
-    elevation: 8,
+
+    elevation: 7,
   },
-} as const;
+
+  xl: {
+    shadowColor: '#000',
+
+    shadowOpacity: 0.18,
+
+    shadowRadius: 14,
+
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+
+    elevation: 10,
+  },
+
+};
+
+export type ShadowKey = keyof typeof Shadows;

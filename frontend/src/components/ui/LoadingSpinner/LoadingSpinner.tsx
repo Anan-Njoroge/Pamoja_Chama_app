@@ -31,12 +31,14 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { AppText } from '@/components/ui';
+import { AppText } from '../Text';
 
 import {
   Colors,
   Spacing,
 } from '@/theme';
+
+import type { ViewComponentProps } from '@/types';
 
 export type LoadingSize =
   | 'small'

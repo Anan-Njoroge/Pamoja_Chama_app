@@ -1,30 +1,9 @@
 /**
  * ============================================================================
- * AppCard Component
+ * AppCard
  * ============================================================================
  *
- * PURPOSE
- * -------
- * AppCard provides a reusable container for displaying grouped content.
- *
- * Instead of styling every View individually, screens should wrap related
- * information inside AppCard.
- *
- * BENEFITS
- * --------
- * • Consistent spacing
- * • Consistent border radius
- * • Consistent shadows
- * • Centralized styling
- * • Easy maintenance
- *
- * EXAMPLES
- * --------
- * Dashboard summary cards
- * Member cards
- * Contribution cards
- * Notification cards
- * Report cards
+ * A reusable card component built on top of AppSurface.
  *
  * ============================================================================
  */
@@ -32,120 +11,142 @@
 import React from 'react';
 
 import {
-  Pressable,
-  StyleProp,
   StyleSheet,
+  Text,
   View,
-  ViewStyle,
 } from 'react-native';
+
+import { AppSurface } from '../Surface';
+import { AppIcon, IconName } from '../Icon';
 
 import {
   Colors,
-  Radius,
-  Shadows,
   Spacing,
-} from '../../../theme';
+  Typography,
+} from '@/theme';
 
-/**
- * ============================================================================
- * Props
- * ============================================================================
- */
+import type { AppSurfaceProps } from '../Surface';
 
-interface AppCardProps {
+import type { ViewComponentProps } from '@/types';
+
+export interface AppCardProps extends AppSurfaceProps, ViewComponentProps {
   /**
-   * Content rendered inside the card.
+   * Card title
    */
-  children: React.ReactNode;
+  title?: string;
 
   /**
-   * Makes the card pressable.
+   * Small description below the title
+   */
+  subtitle?: string;
+
+  /**
+   * Optional leading icon
+   */
+  icon?: IconName;
+
+  /**
+   * Optional element displayed on the far right
    *
-   * If omitted, the card behaves as a normal container.
+   * Example:
+   * Badge
+   * Chevron
+   * Button
    */
-  onPress?: () => void;
-
-  /**
-   * Additional styles.
-   */
-  style?: StyleProp<ViewStyle>;
-
-  /**
-   * Internal spacing.
-   */
-  padding?: number;
-
-  /**
-   * Whether the card should display a shadow.
-   */
-  elevated?: boolean;
+  rightElement?: React.ReactNode;
 }
 
-/**
- * ============================================================================
- * Component
- * ============================================================================
- */
-
-export default function AppCard({
+export function AppCard({
+  title,
+  subtitle,
+  icon,
+  rightElement,
   children,
-  onPress,
-  style,
-  padding = Spacing.md,
-  elevated = true,
+  ...surfaceProps
 }: AppCardProps) {
-  const cardStyle = [
-    styles.card,
-    elevated && Shadows.sm,
-    { padding },
-    style,
-  ];
+  return (
+    <AppSurface
+      variant="card"
+      {...surfaceProps}
+    >
+      {(title || subtitle || icon || rightElement) && (
+        <View style={styles.header}>
+          <View style={styles.leftSection}>
+            {icon && (
+              <View style={styles.iconContainer}>
+                <AppIcon
+                  name={icon}
+                  size="lg"
+                  color="primary"
+                />
+              </View>
+            )}
 
-  /**
-   * If an onPress callback exists,
-   * render a Pressable card.
-   */
+            <View style={styles.textContainer}>
+              {title && (
+                <Text style={styles.title}>
+                  {title}
+                </Text>
+              )}
 
-  if (onPress) {
-    return (
-      <Pressable
-        accessibilityRole="button"
-        onPress={onPress}
-        style={({ pressed }) => [
-          cardStyle,
-          pressed && styles.pressed,
-        ]}
-      >
-        {children}
-      </Pressable>
-    );
-  }
+              {subtitle && (
+                <Text style={styles.subtitle}>
+                  {subtitle}
+                </Text>
+              )}
+            </View>
+          </View>
 
-  /**
-   * Otherwise render a normal View.
-   */
+          {rightElement && (
+            <View style={styles.rightSection}>
+              {rightElement}
+            </View>
+          )}
+        </View>
+      )}
 
-  return <View style={cardStyle}>{children}</View>;
+      {children}
+    </AppSurface>
+  );
 }
-
-/**
- * ============================================================================
- * Styles
- * ============================================================================
- */
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.card,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
 
-    borderRadius: Radius.lg,
-
-    borderWidth: 1,
-
-    borderColor: Colors.border,
+    marginBottom: Spacing.md,
   },
 
-  pressed: {
-    opacity: 0.92,
+  leftSection: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  rightSection: {
+    marginLeft: Spacing.md,
+  },
+
+  iconContainer: {
+    marginRight: Spacing.sm,
+  },
+
+  textContainer: {
+    flex: 1,
+  },
+
+  title: {
+    ...Typography.h3,
+    color: Colors.textPrimary,
+  },
+
+  subtitle: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: 2,
   },
 });
+
+AppCard.displayName = 'AppCard';
