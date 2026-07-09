@@ -1,82 +1,30 @@
-import { Alert, StyleSheet } from 'react-native';
+/**
+ * ============================================================================
+ * Application Entry Point
+ * ============================================================================
+ *
+ * PURPOSE
+ * -------
+ * This is the first React screen rendered after the native Expo splash screen.
+ *
+ * It delegates startup responsibilities to the Splash feature, which:
+ *
+ * ✓ Displays the branded splash screen
+ * ✓ Performs application initialization
+ * ✓ Restores user session (future)
+ * ✓ Loads user preferences (future)
+ * ✓ Navigates to the appropriate destination
+ *
+ * Keeping this file intentionally minimal makes the application's startup
+ * flow easier to understand and maintain.
+ *
+ * ============================================================================
+ */
 
-import { AppButton,
-  AppCard,
-  AppInput,
-  AppScreen,
-  AppText,
-  AppHeader,
-  AppIcon,
-  AppListItem,
-  AppLoadingSpinner,
-  AppFloatingActionButton,
-  AppToast,
-  AppDivider,
- } from '@/components/ui';
+import React from 'react';
 
-import { Colors, Spacing } from '@/theme';
+import { SplashScreen } from '@/features/splash';
 
-export default function HomeScreen() {
-  return (
-    <AppScreen style={styles.container}>
-
-<AppHeader
-    title="Dashboard"
-    subtitle="Welcome back!"
-/>
-
-<AppCard
-  style={{
-    marginTop: Spacing.xl,
-  }}
->
-  <AppText variant="h3">
-    Welcome Back 👋
-  </AppText>
-
-  <AppText
-    color="textSecondary"
-    style={{
-      marginTop: Spacing.sm,
-    }}
-  >
-    You're building the Pamoja Chama app!
-  </AppText>
-</AppCard>
-
-      <AppText variant="h1" color="primary">
-        Pamoja Chama
-      </AppText>
-
-      <AppText
-        variant="body"
-        color="textSecondary"
-      >
-        Building stronger communities together.
-      </AppText>
-
-      <AppInput 
-        label="Phone Number"
-        placeholder="Enter your phone number"
-        keyboardType="phone-pad"
-      />
-
-      <AppButton
-        title="Get Started"
-        onPress={() => Alert.alert('Button Pressed')}
-      />
-
-    </AppScreen>
-  );
+export default function Index() {
+  return <SplashScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-    padding: 24,
-    gap: 20,
-  },
-});
