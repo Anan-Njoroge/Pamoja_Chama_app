@@ -1,0 +1,1 @@
+export const DEFAULT_BUTTON_TITLE = 'Record Payment';
