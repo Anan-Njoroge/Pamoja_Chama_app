@@ -1,14 +1,5 @@
-import React from 'react';
+import { DashboardScreen } from '@/features/dashboard';
 
-import { AppScreen } from '@/components/ui/Screen';
-import { AppText } from '@/components/ui/Text';
-
-export default function DashboardScreen() {
-  return (
-    <AppScreen>
-      <AppText variant="h2">
-        Dashboard
-      </AppText>
-    </AppScreen>
-  );
+export default function MainScreen() {
+  return <DashboardScreen />;
 }

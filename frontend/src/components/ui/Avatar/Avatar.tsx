@@ -64,7 +64,7 @@ export type AvatarRole =
   | 'treasurer'
   | 'admin';
 
-interface AppAvatarProps extends ViewComponentProps {
+export interface AppAvatarProps extends ViewComponentProps {
 
   /**
    * Full name.

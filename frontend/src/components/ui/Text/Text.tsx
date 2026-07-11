@@ -3,23 +3,13 @@
  * AppText
  * ============================================================================
  *
- * PURPOSE
- * -------
- * AppText is the only text component that should be used throughout
- * the Pamoja Chama application.
+ * Centralized text component for the Pamoja Chama application.
  *
- * WHY?
- * ----
- * Instead of styling React Native's Text component on every screen,
- * AppText centralizes typography, colours and accessibility.
- *
- * BENEFITS
- * --------
- * ✓ Consistent typography
- * ✓ Centralized colours
- * ✓ Type-safe variants
- * ✓ Better accessibility
- *
+ * Responsibilities:
+ * ✓ Render themed text
+ * ✓ Apply typography variants
+ * ✓ Apply semantic colours
+ * ✓ Apply optional weight & alignment
  * ============================================================================
  */
 
@@ -27,39 +17,19 @@ import React from 'react';
 
 import {
   Text as RNText,
-  TextProps,
-  StyleSheet,
 } from 'react-native';
 
 import {
   Colors,
   Typography,
-  ColorKey,
 } from '@/theme';
 
-import {
-  TextComponentProps,
-} from '@/types';
+import { FONT_WEIGHTS } from './Text.constants';
+import { styles } from './Text.styles';
 
-export type TextVariant =
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'body'
-  | 'small'
-  | 'caption'
-  | 'button';
-
-export interface AppTextProps
-  extends 
-    TextComponentProps {
-
-  children: React.ReactNode;
-
-  variant?: TextVariant;
-
-  color?: ColorKey;
-}
+import type {
+  AppTextProps,
+} from './Text.types';
 
 export function AppText({
 
@@ -68,6 +38,10 @@ export function AppText({
   variant = 'body',
 
   color = 'textPrimary',
+
+  weight,
+
+  align,
 
   style,
 
@@ -84,39 +58,35 @@ export function AppText({
   return (
 
     <RNText
-
       testID={testID}
-
       accessibilityLabel={accessibilityLabel}
-
       accessibilityHint={accessibilityHint}
-
       style={[
         styles.base,
+
         Typography[variant],
+
         {
           color: Colors[color],
         },
+
+        weight && {
+          fontWeight: FONT_WEIGHTS[weight],
+        },
+
+        align && {
+          textAlign: align,
+        },
+
         style,
       ]}
-
       {...props}
     >
-
       {children}
-
     </RNText>
 
   );
 
 }
 
-const styles = StyleSheet.create({
-
-  base: {
-
-    includeFontPadding: false,
-
-  },
-
-});
+AppText.displayName = 'AppText';
