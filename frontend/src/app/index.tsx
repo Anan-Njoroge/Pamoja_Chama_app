@@ -1,5 +1,5 @@
-import { DashboardScreen } from '@/features/dashboard';
+import { Redirect } from 'expo-router';
 
-export default function Home() {
-  return <DashboardScreen />;
+export default function Index() {
+  return <Redirect href="/splash" />;
 }

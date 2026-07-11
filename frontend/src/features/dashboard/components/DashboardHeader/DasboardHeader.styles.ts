@@ -1,45 +1,38 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
-import {
-  Colors,
-  Spacing,
-} from '@/theme';
+import { Colors, Spacing } from "@/theme";
 
 export const styles = StyleSheet.create({
-
   container: {
+    flexDirection: "row",
 
-    flexDirection: 'row',
+    justifyContent: "space-between",
 
-    justifyContent: 'space-between',
-
-    alignItems: 'center',
+    alignItems: "center",
 
     marginBottom: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
 
   left: {
-
     flex: 1,
   },
 
   greeting: {
-
     marginBottom: 4,
   },
 
   chama: {
-
     marginTop: 2,
   },
 
   actions: {
+    flexDirection: "row",
 
-    flexDirection: 'row',
-
-    alignItems: 'center',
+    alignItems: "center",
 
     gap: Spacing.md,
   },
-
 });
