@@ -3,17 +3,7 @@
  * AppSurface
  * ============================================================================
  *
- * The base container component for the Pamoja Chama application.
- *
- * Components built from AppSurface:
- *
- * • AppCard
- * • AppModal
- * • AppBottomSheet
- * • Dashboard Widgets
- * • Glass Navigation
- * • Popups
- * • Floating Menus
+ * Foundation container for the Pamoja Chama design system.
  *
  * ============================================================================
  */
@@ -39,7 +29,7 @@ import {
   SpacingKey,
 } from '@/theme';
 
-import { ViewComponentProps } from '@/types';
+import type { ViewComponentProps } from '@/types';
 
 export type SurfaceVariant =
   | 'card'
@@ -72,15 +62,23 @@ export interface AppSurfaceProps extends ViewComponentProps {
 
 const SURFACE_PRESETS = {
   card: {
-    backgroundColor: 'card',
+    backgroundColor: 'surface',
     borderColor: 'transparent',
     borderWidth: 0,
     blur: false,
     elevation: 'sm',
   },
 
+  elevated: {
+    backgroundColor: 'surfaceElevated',
+    borderColor: 'transparent',
+    borderWidth: 0,
+    blur: false,
+    elevation: 'md',
+  },
+
   glass: {
-    backgroundColor: 'glass',
+    backgroundColor: 'glassTint',
     borderColor: 'glassBorder',
     borderWidth: 1,
     blur: true,
@@ -102,42 +100,22 @@ const SURFACE_PRESETS = {
     blur: false,
     elevation: 'none',
   },
-
-  elevated: {
-    backgroundColor: 'card',
-    borderColor: 'transparent',
-    borderWidth: 0,
-    blur: false,
-    elevation: 'lg',
-  },
 } as const;
 
 export function AppSurface({
   variant = 'card',
-
   padding = 'lg',
-
-  radius = 'lg',
-
+  radius = 'xl',
   elevation,
-
   backgroundColor,
-
   borderColor,
-
   borderWidth,
-
-  blurIntensity = 35,
-
+  blurIntensity = 45,
   blurTint = 'light',
-
   style,
-
   children,
-
   ...props
 }: AppSurfaceProps) {
-
   const preset = SURFACE_PRESETS[variant];
 
   const surfaceStyle: ViewStyle = {
@@ -145,13 +123,11 @@ export function AppSurface({
 
     padding: Spacing[padding],
 
-    backgroundColor: Colors[
-      backgroundColor ?? preset.backgroundColor
-    ],
+    backgroundColor:
+      Colors[backgroundColor ?? preset.backgroundColor],
 
-    borderColor: Colors[
-      borderColor ?? preset.borderColor
-    ],
+    borderColor:
+      Colors[borderColor ?? preset.borderColor],
 
     borderWidth:
       borderWidth ?? preset.borderWidth,
@@ -196,7 +172,9 @@ export function AppSurface({
 }
 
 const styles = StyleSheet.create({
-  surface: {},
+  surface: {
+    overflow: 'hidden',
+  },
 });
 
 AppSurface.displayName = 'AppSurface';

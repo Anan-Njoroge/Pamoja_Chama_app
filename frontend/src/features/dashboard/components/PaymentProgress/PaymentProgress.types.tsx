@@ -1,6 +1,4 @@
-import type { ViewComponentProps } from '@/types';
-
-export interface PaymentProgressProps extends ViewComponentProps {
+export interface PaymentProgressProps {
   title: string;
 
   amount: number;
@@ -11,5 +9,5 @@ export interface PaymentProgressProps extends ViewComponentProps {
 
   totalMembers: number;
 
-  onRecordPayment: () => void;
+  onRecordPayment?: () => void;
 }

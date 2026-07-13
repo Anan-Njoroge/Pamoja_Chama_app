@@ -3,7 +3,9 @@
  * AppCard
  * ============================================================================
  *
- * A reusable card component built on top of AppSurface.
+ * Premium reusable card component.
+ *
+ * Built on top of AppSurface.
  *
  * ============================================================================
  */
@@ -12,47 +14,34 @@ import React from 'react';
 
 import {
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 
 import { AppSurface } from '../Surface';
-import { AppIcon, IconName } from '../Icon';
+import { AppIcon } from '../Icon';
+import { AppText } from '../Text';
 
 import {
   Colors,
+  Radius,
+  Shadows,
   Spacing,
   Typography,
 } from '@/theme';
 
+import type { IconName } from '../Icon';
 import type { AppSurfaceProps } from '../Surface';
-
 import type { ViewComponentProps } from '@/types';
 
-export interface AppCardProps extends AppSurfaceProps, ViewComponentProps {
-  /**
-   * Card title
-   */
+export interface AppCardProps
+  extends AppSurfaceProps,
+    ViewComponentProps {
   title?: string;
 
-  /**
-   * Small description below the title
-   */
   subtitle?: string;
 
-  /**
-   * Optional leading icon
-   */
   icon?: IconName;
 
-  /**
-   * Optional element displayed on the far right
-   *
-   * Example:
-   * Badge
-   * Chevron
-   * Button
-   */
   rightElement?: React.ReactNode;
 }
 
@@ -62,11 +51,13 @@ export function AppCard({
   icon,
   rightElement,
   children,
+  style,
   ...surfaceProps
 }: AppCardProps) {
   return (
     <AppSurface
       variant="card"
+      style={[styles.card, style]}
       {...surfaceProps}
     >
       {(title || subtitle || icon || rightElement) && (
@@ -77,22 +68,28 @@ export function AppCard({
                 <AppIcon
                   name={icon}
                   size="lg"
-                  color="primary"
+                  tone="primary"
                 />
               </View>
             )}
 
             <View style={styles.textContainer}>
               {title && (
-                <Text style={styles.title}>
+                <AppText
+                  variant="h3"
+                  weight="semibold"
+                >
                   {title}
-                </Text>
+                </AppText>
               )}
 
               {subtitle && (
-                <Text style={styles.subtitle}>
+                <AppText
+                  variant="caption"
+                  color="textSecondary"
+                >
                   {subtitle}
-                </Text>
+                </AppText>
               )}
             </View>
           </View>
@@ -111,17 +108,29 @@ export function AppCard({
 }
 
 const styles = StyleSheet.create({
+  card: {
+    borderRadius: Radius.xl,
+
+    backgroundColor: Colors.surface,
+
+    ...Shadows.sm,
+  },
+
   header: {
     flexDirection: 'row',
+
     alignItems: 'center',
+
     justifyContent: 'space-between',
 
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
   },
 
   leftSection: {
     flex: 1,
+
     flexDirection: 'row',
+
     alignItems: 'center',
   },
 
@@ -130,22 +139,23 @@ const styles = StyleSheet.create({
   },
 
   iconContainer: {
-    marginRight: Spacing.sm,
+    width: 44,
+
+    height: 44,
+
+    borderRadius: 22,
+
+    backgroundColor: Colors.primaryLight,
+
+    justifyContent: 'center',
+
+    alignItems: 'center',
+
+    marginRight: Spacing.md,
   },
 
   textContainer: {
     flex: 1,
-  },
-
-  title: {
-    ...Typography.h3,
-    color: Colors.textPrimary,
-  },
-
-  subtitle: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
-    marginTop: 2,
   },
 });
 

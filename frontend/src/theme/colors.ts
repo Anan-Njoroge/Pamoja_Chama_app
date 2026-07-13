@@ -79,6 +79,12 @@ export const Colors = {
 
   background: '#F8F9FC',
 
+  surface: '#FFFFFF',
+
+  surfaceSecondary: '#FAFBFD',
+
+  surfaceElevated: '#FFFFFF',
+
   card: '#FFFFFF',
 
   white: '#FFFFFF',
@@ -137,11 +143,13 @@ export const Colors = {
 
 overlay: 'rgba(0,0,0,0.35)',
 
-glass: 'rgba(255,255,255,0.22)',
+glass: 'rgba(255,255,255,0.18)',
 
-glassStrong: 'rgba(255,255,255,0.35)',
+glassStrong: 'rgba(255,255,255,0.28)',
 
-glassBorder: 'rgba(255,255,255,0.40)',
+glassTint: 'rgba(83,74,183,0.08)',
+
+glassBorder: 'rgba(255,255,255,0.35)',
 } as const;
 
 /**

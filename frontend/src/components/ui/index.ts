@@ -42,6 +42,7 @@ export * from './Input';
 export * from './ListItem';
 export * from './Screen';
 export * from './SearchBar';
+export * from './Surface';
 export * from './Text';
 export * from './EmptyState';
 export * from './LoadingSpinner';

@@ -3,173 +3,320 @@
  * AppInput
  * ============================================================================
  *
- * Reusable text input for the entire application.
+ * Enterprise reusable input component.
  *
- * Every form should use AppInput instead of React Native's TextInput.
- *
- * Future enhancements:
- *
+ * FEATURES
+ * --------
+ * ✓ Label
+ * ✓ Required indicator
+ * ✓ Helper text
+ * ✓ Error state
+ * ✓ Success / Warning state
  * ✓ Left icon
  * ✓ Right icon
- * ✓ Password toggle
- * ✓ Phone formatting
- * ✓ Validation
- * ✓ Character counter
+ * ✓ Password visibility toggle
+ * ✓ Clear button
+ * ✓ Focus state
+ * ✓ AppSurface integration
+ * ✓ Fully typed
+ * ✓ Accessible
+ *
  * ============================================================================
  */
 
-import React from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 
 import {
-  StyleProp,
-  StyleSheet,
   TextInput,
-  TextInputProps,
-  TextStyle,
   View,
 } from 'react-native';
 
+import { AppSurface } from '../Surface';
+import { AppIcon } from '../Icon';
 import { AppText } from '../Text';
-
-import type { IconName } from '../Icon';
 
 import {
   Colors,
-  Radius,
-  Spacing,
-  Typography,
 } from '@/theme';
 
-import type { ViewComponentProps } from '@/types';
+import {
+  INPUT_STATE_COLORS,
+} from './Input.constants';
 
-export interface AppInputProps
-  extends Omit<TextInputProps, 'style'> {
+import {
+  styles,
+} from './Input.styles';
 
-  /**
-   * Optional label shown above the field.
-   */
-  label?: string;
+import type {
+  AppInputProps,
+} from './Input.types';
 
-  /**
-   * Validation error.
-   */
-  error?: string;
+export const AppInput = forwardRef<TextInput, AppInputProps>(({
 
-  /**
-   * Helper text shown below the field.
-   */
-  helperText?: string;
-
-  /**
-   * Reserved for future implementation.
-   */
-  leftIcon?: IconName;
-
-  /**
-   * Reserved for future implementation.
-   */
-  rightIcon?: IconName;
-
-  /**
-   * TextInput style.
-   */
-  style?: StyleProp<TextStyle>;
-}
-
-export function AppInput({
   label,
-  error,
+
   helperText,
-  style,
+
+  error,
+
+  required = false,
+
+  state = 'default',
+
+  variant = 'filled',
+
+  leftIcon,
+
+  rightIcon,
+
+  clearable = false,
+
+  secureTextEntry = false,
+
+  editable = true,
+
+  value,
+
+  containerStyle,
+
+  onFocus,
+
+  onBlur,
+
+  onChangeText,
+
+  accessibilityLabel,
+
+  accessibilityHint,
+
   ...props
-}: AppInputProps) {
+
+}, ref) => {
+
+  /**
+   * --------------------------------------------------------------------------
+   * Internal Ref
+   * --------------------------------------------------------------------------
+   */
+
+  const inputRef = useRef<TextInput>(null);
+
+  useImperativeHandle(ref, () => inputRef.current as TextInput);
+
+  /**
+   * --------------------------------------------------------------------------
+   * Local State
+   * --------------------------------------------------------------------------
+   */
+
+  const [focused, setFocused] = useState(false);
+
+  const [hidden, setHidden] = useState(secureTextEntry);
+
+  /**
+   * --------------------------------------------------------------------------
+   * Derived Values
+   * --------------------------------------------------------------------------
+   */
+
+  const colors =
+    INPUT_STATE_COLORS[
+      error ? 'error' : state
+    ];
+
+  const borderColor =
+    focused
+      ? Colors.primary
+      : Colors[colors.border];
+
+  const helperColor =
+    Colors[
+      error
+        ? 'danger'
+        : colors.helper
+    ];
+
+  /**
+   * --------------------------------------------------------------------------
+   * Event Handlers
+   * --------------------------------------------------------------------------
+   */
+
+  function handleFocus(
+    e: Parameters<
+      NonNullable<
+        AppInputProps['onFocus']
+      >
+    >[0],
+  ) {
+
+    setFocused(true);
+
+    onFocus?.(e);
+
+  }
+
+  function handleBlur(
+    e: Parameters<
+      NonNullable<
+        AppInputProps['onBlur']
+      >
+    >[0],
+  ) {
+
+    setFocused(false);
+
+    onBlur?.(e);
+
+  }
+
+  function clearInput() {
+
+    onChangeText?.('');
+
+  }
 
   return (
 
-    <View style={styles.container}>
+    <View style={containerStyle}>
 
       {label && (
+
         <AppText
           variant="small"
-          color="textSecondary"
+          color={
+            error
+              ? 'danger'
+              : focused
+              ? 'primary'
+              : 'textSecondary'
+          }
           style={styles.label}
         >
           {label}
+
+          {required && (
+            <AppText
+              color="danger"
+            >
+              {' '}*
+            </AppText>
+          )}
+
         </AppText>
+
       )}
 
-      <TextInput
-        {...props}
-        placeholderTextColor={Colors.textPlaceholder}
+      <AppSurface
+        variant="card"
         style={[
-          styles.input,
-          error && styles.inputError,
-          style,
+          styles.inputContainer,
+          {
+            borderColor,
+            backgroundColor: editable
+              ? Colors.surface
+              : Colors.background,
+          },
         ]}
-      />
+      >
+              {leftIcon && (
+          <View style={styles.iconLeft}>
+            <AppIcon
+              name={leftIcon}
+              color={
+                focused
+                  ? 'primary'
+                  : 'textPlaceholder'
+              }
+              size="md"
+            />
+          </View>
+        )}
 
-      {error ? (
+        <TextInput
+          ref={inputRef}
+          value={value}
+          editable={editable}
+          style={styles.input}
+          secureTextEntry={hidden}
+          placeholderTextColor={Colors.textPlaceholder}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onChangeText={onChangeText}
+          accessibilityLabel={accessibilityLabel}
+          accessibilityHint={accessibilityHint}
+          {...props}
+        />
+
+        {secureTextEntry && (
+          <View style={styles.iconRight}>
+            <AppIcon
+              name={
+                hidden
+                  ? 'eye'
+                  : 'eye-off'
+              }
+              size="md"
+              color="textPlaceholder"
+              onPress={() =>
+                setHidden(!hidden)
+              }
+            />
+          </View>
+        )}
+
+        {!secureTextEntry &&
+          clearable &&
+          value &&
+          value.length > 0 && (
+            <View style={styles.iconRight}>
+              <AppIcon
+                name="close"
+                size="md"
+                color="textPlaceholder"
+                onPress={clearInput}
+              />
+            </View>
+          )}
+
+        {!secureTextEntry &&
+          !clearable &&
+          rightIcon && (
+            <View style={styles.iconRight}>
+              <AppIcon
+                name={rightIcon}
+                size="md"
+                color="textPlaceholder"
+              />
+            </View>
+          )}
+      </AppSurface>
+
+      {(error || helperText) && (
         <AppText
           variant="caption"
-          color="danger"
-          style={styles.message}
+          color={
+            error
+              ? 'danger'
+              : 'textPlaceholder'
+          }
+          style={[
+            styles.helper,
+            {
+              color: helperColor,
+            },
+          ]}
         >
-          {error}
+          {error ?? helperText}
         </AppText>
-      ) : helperText ? (
-        <AppText
-          variant="caption"
-          color="textSecondary"
-          style={styles.message}
-        >
-          {helperText}
-        </AppText>
-      ) : null}
-
+      )}
     </View>
-
   );
-
-}
+});
 
 AppInput.displayName = 'AppInput';
-
-const styles = StyleSheet.create({
-
-  container: {
-    width: '100%',
-    marginBottom: Spacing.md,
-  },
-
-  label: {
-    marginBottom: Spacing.xs,
-  },
-
-  input: {
-    height: 52,
-
-    paddingHorizontal: Spacing.md,
-
-    borderWidth: 1,
-    borderColor: Colors.border,
-
-    borderRadius: Radius.md,
-
-    backgroundColor: Colors.white,
-
-    color: Colors.textPrimary,
-
-    fontSize: Typography.body.fontSize,
-    lineHeight: Typography.body.lineHeight,
-    fontWeight: Typography.body.fontWeight,
-  },
-
-  inputError: {
-    borderColor: Colors.danger,
-  },
-
-  message: {
-    marginTop: Spacing.xs,
-  },
-
-});
