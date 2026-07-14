@@ -1,28 +1,41 @@
+import { useCallback } from 'react';
+
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import * as SplashScreen from 'expo-splash-screen';
 
-import { useEffect } from 'react';
+import {
+  useFonts,
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
 
-// Keep the native splash visible until we hide it manually.
+// Keep the native splash screen visible while the app loads.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  useEffect(() => {
-    async function prepare() {
-      // Small delay allows the first React screen to mount cleanly.
-      await new Promise(resolve => setTimeout(resolve, 100));
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_700Bold,
+  });
 
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
+  }, [fontsLoaded]);
 
-    prepare();
-  }, []);
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider onLayout={onLayoutRootView}>
       <StatusBar style="light" />
 
       <Stack

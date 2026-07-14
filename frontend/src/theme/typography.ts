@@ -1,54 +1,50 @@
-// src/theme/typography.ts
+import { TextStyle } from 'react-native';
 
 export const Typography = {
   h1: {
+    fontFamily: 'DMSans_700Bold',
     fontSize: 32,
     lineHeight: 40,
-    fontWeight: '700' as const,
+    letterSpacing: -0.5,
   },
 
   h2: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: '700' as const,
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 26,
+    lineHeight: 34,
+    letterSpacing: -0.3,
   },
 
   h3: {
-    fontSize: 20,
-    lineHeight: 28,
-    fontWeight: '600' as const,
-  },
-
-  // ⭐ Added
-  title: {
-    fontSize: 18,
-    lineHeight: 26,
-    fontWeight: '600' as const,
+    fontFamily: 'DMSans_600SemiBold',
+    fontSize: 22,
+    lineHeight: 30,
   },
 
   body: {
+    fontFamily: 'DMSans_400Regular',
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: '400' as const,
-  },
-
-  small: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '400' as const,
-  },
-
-  caption: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: '400' as const,
   },
 
   button: {
+    fontFamily: 'DMSans_600SemiBold',
     fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '600' as const,
+    lineHeight: 20,
+    letterSpacing: 0.2,
   },
-} as const;
 
-export type TypographyKey = keyof typeof Typography;
+  small: {
+    fontFamily: 'DMSans_500Medium',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  caption: {
+    fontFamily: 'DMSans_400Regular',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+} satisfies Record<string, TextStyle>;
+
+export type TypographyVariant = keyof typeof Typography;

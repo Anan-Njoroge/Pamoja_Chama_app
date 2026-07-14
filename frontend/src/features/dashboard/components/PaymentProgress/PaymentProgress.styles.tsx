@@ -5,45 +5,41 @@ import {
   Radius,
   Shadows,
   Spacing,
-  Typography,
 } from '@/theme';
 
 export const styles = StyleSheet.create({
-
   card: {
-    backgroundColor: Colors.primary,
+    borderRadius: Radius.xxl,
 
-    borderRadius: Radius.xl,
-
-    padding: Spacing.xl,
+    overflow: 'hidden',
 
     ...Shadows.md,
   },
 
+  gradient: {
+    padding: Spacing.xl,
+  },
+
   title: {
-    ...Typography.body,
+    color: Colors.primaryLight,
 
-    color: Colors.white,
+    opacity: 0.9,
 
-    opacity: 0.85,
+    marginBottom: Spacing.sm,
   },
 
   amount: {
-    ...Typography.h1,
-
     color: Colors.white,
 
-    marginTop: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
 
   progressBackground: {
     height: 10,
 
-    backgroundColor: 'rgba(255,255,255,0.25)',
-
     borderRadius: 999,
 
-    marginTop: Spacing.lg,
+    backgroundColor: 'rgba(255,255,255,0.25)',
 
     overflow: 'hidden',
   },
@@ -51,13 +47,13 @@ export const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
 
-    backgroundColor: Colors.success,
-
     borderRadius: 999,
+
+    backgroundColor: Colors.successBright,
   },
 
-  footer: {
-    marginTop: Spacing.md,
+  progressInfo: {
+    marginTop: Spacing.sm,
 
     flexDirection: 'row',
 
@@ -66,12 +62,23 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  members: {
+  progressText: {
     color: Colors.white,
+
+    opacity: 0.9,
+  },
+
+  footer: {
+    marginTop: Spacing.xl,
+
+    flexDirection: 'row',
+
+    justifyContent: 'space-between',
+
+    alignItems: 'center',
   },
 
   button: {
     backgroundColor: Colors.white,
   },
-
 });

@@ -1,19 +1,37 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
-import { Colors, Spacing } from "@/theme";
+import {
+  Colors,
+  Radius,
+  Shadows,
+  Spacing,
+} from '@/theme';
 
 export const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
+    marginHorizontal: Spacing.lg,
 
-    justifyContent: "space-between",
-
-    alignItems: "center",
+    marginTop: Spacing.md,
 
     marginBottom: Spacing.xl,
+
+    borderRadius: Radius.xl,
+
+    overflow: 'hidden',
+
+    ...Shadows.sm,
+  },
+
+  content: {
+    flexDirection: 'row',
+
+    justifyContent: 'space-between',
+
+    alignItems: 'center',
+
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
+
+    paddingVertical: Spacing.lg,
   },
 
   left: {
@@ -25,14 +43,32 @@ export const styles = StyleSheet.create({
   },
 
   chama: {
-    marginTop: 2,
+    marginBottom: 2,
+  },
+
+  username: {
+    opacity: 0.8,
   },
 
   actions: {
-    flexDirection: "row",
+    flexDirection: 'row',
 
-    alignItems: "center",
+    alignItems: 'center',
 
     gap: Spacing.md,
+  },
+
+  iconButton: {
+    width: 44,
+
+    height: 44,
+
+    borderRadius: 22,
+
+    justifyContent: 'center',
+
+    alignItems: 'center',
+
+    backgroundColor: Colors.primaryLight,
   },
 });
