@@ -5,6 +5,7 @@ import type { ColorKey } from '@/theme';
 import type { TextComponentProps } from '@/types';
 
 export type TextVariant =
+  | 'display'
   | 'h1'
   | 'h2'
   | 'h3'

@@ -15,6 +15,6 @@ export interface ComponentSectionProps {
   /**
    * Components to showcase.
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
 
 }

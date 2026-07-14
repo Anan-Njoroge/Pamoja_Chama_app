@@ -34,20 +34,21 @@ export function ExampleCard({
 
     <AppCard>
 
-      <AppText variant="h3">
-        {title}
-      </AppText>
+      {title && (
+        <AppText 
+        variant="small"
+        >
+          {title}
+        </AppText>
+      )}
 
-      {description && (
-
+      {description &&  (
         <AppText
-          variant="body"
-          color="textSecondary"
-          style={styles.description}
+        variant="small"
+        color="textSecondary"
         >
           {description}
         </AppText>
-
       )}
 
       {children}

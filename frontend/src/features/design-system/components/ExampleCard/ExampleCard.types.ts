@@ -5,7 +5,7 @@ export interface ExampleCardProps {
   /**
    * Example title.
    */
-  title: string;
+  title?: string;
 
   /**
    * Optional explanation.
@@ -15,6 +15,6 @@ export interface ExampleCardProps {
   /**
    * Example preview.
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
 
 }

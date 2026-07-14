@@ -1,287 +1,115 @@
-/**
- * ============================================================================
- * AppAvatar Component
- * ============================================================================
- *
- * PURPOSE
- * -------
- * Displays a user's avatar throughout the application.
- *
- * The avatar supports:
- *
- * ✓ Profile image
- * ✓ Initials fallback
- * ✓ Online/offline indicator
- * ✓ Role badge
- * ✓ Multiple sizes
- * ✓ Theme colours
- *
- * WHY?
- * ----
- * Nearly every screen in the application displays users.
- * Having a single reusable Avatar component guarantees
- * consistent styling everywhere.
- *
- * ============================================================================
- */
-
 import React from 'react';
 
 import {
   Image,
-  ImageSourcePropType,
-  StyleProp,
-  StyleSheet,
   View,
-  ViewStyle,
 } from 'react-native';
 
 import { AppText } from '../Text';
-import { AppBadge } from '../Badge';
 
 import {
   Colors,
-  Radius,
-  Spacing,
 } from '@/theme';
 
-import type { ViewComponentProps } from '@/types';
+import {
+  AVATAR_SIZES,
+} from './Avatar.constants';
 
-export type AvatarSize =
-  | 'xs'
-  | 'sm'
-  | 'md'
-  | 'lg'
-  | 'xl';
+import {
+  styles,
+} from './Avatar.styles';
 
-export type AvatarStatus =
-  | 'online'
-  | 'offline'
-  | 'busy';
+import type {
+  AppAvatarProps,
+} from './Avatar.types';
 
-export type AvatarRole =
-  | 'member'
-  | 'treasurer'
-  | 'admin';
+const AVATAR_COLORS = [
+  Colors.avatarPurple,
+  Colors.avatarBlue,
+  Colors.avatarSky,
+  Colors.avatarGreen,
+  Colors.avatarTeal,
+  Colors.avatarOrange,
+  Colors.avatarRed,
+  Colors.avatarViolet,
+];
 
-export interface AppAvatarProps extends ViewComponentProps {
-
-  /**
-   * Full name.
-   * Used to generate initials.
-   */
-  name: string;
-
-  /**
-   * Optional profile image.
-   */
-  source?: ImageSourcePropType;
-
-  /**
-   * Avatar size.
-   */
-  size?: AvatarSize;
-
-  /**
-   * Optional presence indicator.
-   */
-  status?: AvatarStatus;
-
-  /**
-   * Optional role badge.
-   */
-  role?: AvatarRole;
-
-  style?: StyleProp<ViewStyle>;
-}
-
-/**
- * Avatar dimensions.
- */
-const SIZES: Record<AvatarSize, number> = {
-  xs: 28,
-  sm: 36,
-  md: 48,
-  lg: 64,
-  xl: 88,
-};
-
-/**
- * Generate initials from a full name.
- *
- * "John Mwangi" → JM
- * "Mary" → M
- */
 function getInitials(name: string) {
-
   return name
     .trim()
     .split(' ')
     .slice(0, 2)
-    .map(part => part[0])
-    .join('')
-    .toUpperCase();
+    .map(word => word.charAt(0).toUpperCase())
+    .join('');
 }
-/**
- * Generates a deterministic avatar colour based on the user's name.
- *
- * Instead of returning hard-coded hex values, the colours come directly
- * from our design tokens (Colors.ts). This keeps every colour in the
- * application centralized and easy to maintain.
- */
+
 function getAvatarColor(name: string) {
-  const palette = [
-    Colors.avatarPurple,
-    Colors.avatarBlue,
-    Colors.avatarSky,
-    Colors.avatarGreen,
-    Colors.avatarTeal,
-    Colors.avatarOrange,
-    Colors.avatarRed,
-    Colors.avatarViolet,
+  const hash = name
+    .split('')
+    .reduce(
+      (sum, char) => sum + char.charCodeAt(0),
+      0,
+    );
+
+  return AVATAR_COLORS[
+    hash % AVATAR_COLORS.length
   ];
-
-  let hash = 0;
-
-  for (let i = 0; i < name.length; i++) {
-    hash += name.charCodeAt(i);
-  }
-
-  return palette[hash % palette.length];
 }
 
 export function AppAvatar({
   name,
   source,
   size = 'md',
-  status,
-  role,
+  online = false,
   style,
 }: AppAvatarProps) {
 
-  const dimension = SIZES[size];
+  const currentSize =
+    AVATAR_SIZES[size];
+
+  const backgroundColor =
+    getAvatarColor(name);
 
   return (
-    <View style={style}>
-
-      <View
-        style={[
-          styles.avatar,
-          {
-            width: dimension,
-            height: dimension,
-            borderRadius: dimension / 2,
-            backgroundColor: getAvatarColor(name),
-          },
-        ]}
-      >
-        {source ? (
-
-          <Image
-            source={source}
-            style={{
-              width: dimension,
-              height: dimension,
-              borderRadius: dimension / 2,
-            }}
-          />
-
-        ) : (
-
-          <AppText
-            variant={
-              size === 'xs'
-                ? 'caption'
-                : size === 'sm'
-                ? 'small'
-                : 'body'
-            }
-            color="white"
-          >
-            {getInitials(name)}
-          </AppText>
-
-        )}
-
-        {status && (
-          <View
-            style={[
-              styles.status,
-
-              {
-                backgroundColor:
-                  status === 'online'
-                    ? Colors.success
-                    : status === 'busy'
-                    ? Colors.pending
-                    : Colors.disabled,
-
-                width: dimension * 0.22,
-                height: dimension * 0.22,
-                borderRadius: dimension,
-              },
-            ]}
-          />
-        )}
-
-      </View>
-
-      {role && (
-
-        <View
-          style={styles.roleBadge}
+    <View
+      style={[
+        styles.container,
+        {
+          width: currentSize.size,
+          height: currentSize.size,
+          borderRadius: currentSize.radius,
+          backgroundColor,
+        },
+        style,
+      ]}
+    >
+      {source ? (
+        <Image
+          source={source}
+          style={styles.image}
+        />
+      ) : (
+        <AppText
+          variant={currentSize.fontVariant}
+          color="white"
         >
-          <AppBadge
-            size="sm"
-            label={
-              role.charAt(0).toUpperCase() +
-              role.slice(1)
-            }
-            variant={
-              role === 'admin'
-                ? 'danger'
-                : role === 'treasurer'
-                ? 'primary'
-                : 'neutral'
-            }
-          />
-        </View>
-
+          {getInitials(name)}
+        </AppText>
       )}
 
+      {online && (
+        <View
+          style={[
+            styles.indicator,
+            {
+              width: currentSize.indicator,
+              height: currentSize.indicator,
+            },
+          ]}
+        />
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-
-  avatar: {
-
-    justifyContent: 'center',
-
-    alignItems: 'center',
-
-    overflow: 'hidden',
-  },
-
-  status: {
-
-    position: 'absolute',
-
-    right: 2,
-
-    bottom: 2,
-
-    borderWidth: 2,
-
-    borderColor: Colors.white,
-  },
-
-  roleBadge: {
-
-    marginTop: Spacing.xs,
-
-    alignItems: 'center',
-  },
-
-});
+AppAvatar.displayName = 'AppAvatar';

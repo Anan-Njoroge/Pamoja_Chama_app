@@ -57,7 +57,7 @@ export interface AppSurfaceProps extends ViewComponentProps {
 
   blurTint?: 'light' | 'dark' | 'default';
 
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const SURFACE_PRESETS = {
