@@ -13,7 +13,7 @@ export const BADGE_EXAMPLES: BadgeExample[] = [
 
   {
     label: 'Pending',
-    variant: 'warning',
+    variant: 'pending',
   },
 
   {
@@ -28,6 +28,6 @@ export const BADGE_EXAMPLES: BadgeExample[] = [
 
   {
     label: 'Member',
-    variant: 'secondary',
+    variant: 'neutral',
   },
 ];
