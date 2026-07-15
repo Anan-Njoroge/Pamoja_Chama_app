@@ -2,14 +2,11 @@
  * ============================================================================
  * Avatar Exports
  * ============================================================================
- *
- * Public exports for the AppAvatar component.
  */
 
 export { AppAvatar } from './Avatar';
 
 export type {
-  AvatarRole,
+  AppAvatarProps,
   AvatarSize,
-  AvatarStatus,
-} from './Avatar';
+} from './Avatar.types';

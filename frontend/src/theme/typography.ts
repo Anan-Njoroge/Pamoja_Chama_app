@@ -1,6 +1,13 @@
 import { TextStyle } from 'react-native';
 
 export const Typography = {
+  display: {
+    fontFamily: 'DMSans_700Bold',
+    fontSize: 40,
+    lineHeight: 48,
+    letterSpacing: -0.8,
+  },
+
   h1: {
     fontFamily: 'DMSans_700Bold',
     fontSize: 32,
