@@ -13,6 +13,7 @@ import {
   DMSans_600SemiBold,
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
+import { AppProviders } from '@/providers/AppProviders';
 
 // Keep the native splash screen visible while the app loads.
 SplashScreen.preventAutoHideAsync();
@@ -21,6 +22,7 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
     DMSans_500Medium,
+    DMSans_600SemiBold,
     DMSans_700Bold,
   });
 
@@ -36,13 +38,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <StatusBar style="light" />
+  <AppProviders>
+    <StatusBar style="light" />
 
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </SafeAreaProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    />
+  </AppProviders>
+</SafeAreaProvider>
   );
 }

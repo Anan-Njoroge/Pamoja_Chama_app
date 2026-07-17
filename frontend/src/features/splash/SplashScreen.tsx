@@ -48,9 +48,15 @@ export function SplashScreen() {
   }, []);
 
   useEffect(() => {
-    if (isReady) {
-      router.replace('/(main)');
+
+    if (!isReady) {
+  
+      return;
+  
     }
+  
+    router.replace('/');
+  
   }, [isReady]);
 
   return (
