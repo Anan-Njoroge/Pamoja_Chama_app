@@ -29,8 +29,8 @@ create table public.meetings (
     status meeting_status
         not null default 'scheduled',
 
-    created_by uuid
-        references public.profiles(id),
+    created_by text
+    references public.profiles(id),
 
     created_at timestamptz
         not null default now(),

@@ -3,7 +3,10 @@
 -- ============================================================================
 
 create table public.profiles (
-    id uuid primary key references auth.users(id) on delete cascade,
+
+    id uuid primary key
+        references auth.users(id)
+        on delete cascade,
 
     full_name text not null,
 
@@ -11,13 +14,15 @@ create table public.profiles (
 
     avatar_url text,
 
+    role text not null default 'member',
+
     is_active boolean not null default true,
 
     created_at timestamptz not null default now(),
 
     updated_at timestamptz not null default now()
-);
 
+);
 -- ============================================================================
 -- Groups
 -- ============================================================================
@@ -33,7 +38,7 @@ create table public.groups (
 
     meeting_day text,
 
-    created_by uuid references public.profiles(id),
+    created_by text references public.profiles(id),
 
     created_at timestamptz not null default now(),
 
@@ -67,9 +72,9 @@ create type membership_status as enum (
 create table public.memberships (
     id uuid primary key default gen_random_uuid(),
 
-    profile_id uuid not null
-        references public.profiles(id)
-        on delete cascade,
+    profile_id text not null
+    references public.profiles(id)
+    on delete cascade,
 
     group_id uuid not null
         references public.groups(id)
