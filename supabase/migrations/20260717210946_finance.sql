@@ -17,8 +17,8 @@ create table public.contributions (
     payment_date timestamptz
         not null default now(),
 
-    recorded_by uuid
-        references public.profiles(id),
+    recorded_by text
+    references public.profiles(id),
 
     created_at timestamptz
         not null default now()
@@ -56,8 +56,8 @@ create table public.loans (
     status loan_status
         not null default 'pending',
 
-    approved_by uuid
-        references public.profiles(id),
+   approved_by text
+    references public.profiles(id),
 
     approved_at timestamptz,
 
@@ -80,8 +80,8 @@ create table public.repayments (
     payment_date timestamptz
         not null default now(),
 
-    recorded_by uuid
-        references public.profiles(id),
+    recorded_by text
+    references public.profiles(id),
 
     created_at timestamptz
         not null default now()
