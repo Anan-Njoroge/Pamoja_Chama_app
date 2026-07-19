@@ -3,46 +3,84 @@
  * Authentication Types
  * ============================================================================
  *
- * Shared types used throughout the Authentication module.
+ * PURPOSE
+ * -------
+ * Defines every authentication model used throughout the application.
+ *
+ * These types are intentionally independent of React so they can be reused
+ * across:
+ *
+ * • Services
+ * • Hooks
+ * • Context
+ * • Screens
+ * • Storage
+ *
+ * Authentication is handled entirely by Supabase Auth using Email OTP.
+ *
+ * ============================================================================
  */
-
-export type UserRole =
-  | 'member'
-  | 'treasurer'
-  | 'administrator';
-
-export interface AuthUser {
-
-  id: string;
-
-  fullName: string;
-
-  phoneNumber: string;
-
-  role: UserRole;
-
-  groupId: string;
-
-}
 
 export interface LoginRequest {
 
-  phoneNumber: string;
+  email: string;
 
 }
 
 export interface VerifyOtpRequest {
 
-  phoneNumber: string;
+  email: string;
 
-  otp: string;
+  token: string;
+
+}
+
+export interface UserProfile {
+
+  id: string;
+
+  email: string;
+
+  fullName: string | null;
+
+  role: 'member' | 'treasurer' | 'administrator';
+
+  avatarUrl: string | null;
 
 }
 
 export interface AuthSession {
 
-  token: string;
+  accessToken: string;
 
-  user: AuthUser;
+  refreshToken: string;
+
+  expiresAt: number;
+
+}
+
+export interface AuthState {
+
+  user: UserProfile | null;
+
+  session: AuthSession | null;
+
+  loading: boolean;
+
+}
+
+export interface LoginResponse {
+
+  success: boolean;
+
+  message: string;
+
+}
+
+export interface VerifyOtpResponse {
+
+  success: boolean;
+
+  message: string;
 
 }

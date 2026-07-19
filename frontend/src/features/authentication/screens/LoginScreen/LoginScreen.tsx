@@ -7,118 +7,145 @@
  * -------
  * Entry point into the application.
  *
- * Users may:
+ * Users authenticate using their email address.
  *
- * • Sign in with their phone number
- * • Choose a demo account for presentations
- *
- * The screen itself contains very little business logic.
- * Authentication is delegated to useLogin().
+ * This screen delegates business logic to useLogin(),
+ * but temporarily includes a test button to verify that
+ * Supabase Email OTP is working.
  *
  * ============================================================================
  */
 
-import React from "react";
+import React from 'react';
+import { Alert, View } from 'react-native';
 
-import { View } from "react-native";
+import {
+  AppButton,
+  AppInput,
+} from '@/components/ui';
 
-import { AppButton, AppInput, AppText, AppDivider } from "@/components/ui";
+import { authService } from '../../services/auth.service';
 
-import { AuthenticationLayout } from "../../components/AuthenticationLayout";
+import { AuthenticationLayout } from '../../components/AuthenticationLayout';
 
-import { DemoAccountCard } from "../../components/DemoAccountCard";
+import { LOGIN_SCREEN } from './LoginScreen.constants';
 
-import { DEMO_USERS } from "../../constants/demoUsers";
+import { styles } from './LoginScreen.styles';
 
-import { LOGIN_SCREEN } from "./LoginScreen.constants";
-
-import { styles } from "./LoginScreen.styles";
-
-import { useLogin } from "../../hooks/useLogin";
-
-import type { IconName } from '@/components/ui';
-
-function getRoleIcon(
-  role: string,
-): IconName {
-
-  switch (role) {
-
-    case 'treasurer':
-      return 'wallet';
-
-    case 'administrator':
-      return 'settings';
-
-    default:
-      return 'profile';
-
-  }
-
-}
+import { useLogin } from '../../hooks/useLogin';
 
 export function LoginScreen() {
+
   const {
-    phoneNumber,
 
-    setPhoneNumber,
+    email,
 
-    continueLogin,
-
-    selectDemoAccount,
+    setEmail,
 
     loading,
+
   } = useLogin();
 
+  const testOtp = async () => {
+
+    try {
+
+      const { data, error } =
+        await authService.signInWithEmail({
+
+          email,
+
+        });
+
+      console.log(
+        'Supabase Response:',
+        data,
+      );
+
+      console.log(
+        'Supabase Error:',
+        error,
+      );
+
+      if (error) {
+
+        Alert.alert(
+          'Authentication Error',
+          error.message,
+        );
+
+        return;
+
+      }
+
+      Alert.alert(
+        'Success',
+        'Check your email for the verification code.',
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      Alert.alert(
+        'Unexpected Error',
+        'Something went wrong.',
+      );
+
+    }
+
+  };
+
   return (
+
     <AuthenticationLayout
+
       title={LOGIN_SCREEN.title}
+
       subtitle={LOGIN_SCREEN.subtitle}
+
     >
+
       <View style={styles.container}>
+
         <AppInput
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholder={LOGIN_SCREEN.phonePlaceholder}
-          keyboardType="phone-pad"
-          leftIcon="phone"
+
+          value={email}
+
+          onChangeText={setEmail}
+
+          placeholder="Enter your email"
+
+          keyboardType="email-address"
+
+          autoCapitalize="none"
+
+          autoCorrect={false}
+
+          leftIcon="email"
+
           containerStyle={styles.input}
+
         />
 
         <AppButton
-          title={LOGIN_SCREEN.continueButton}
+
+          title="Send Verification Code"
+
           loading={loading}
-          onPress={continueLogin}
+
+          onPress={testOtp}
+
           style={styles.button}
+
         />
 
-        <View style={styles.dividerContainer}>
-          <AppDivider label="OR" spacing="xl" />
-        </View>
-
-        <View style={styles.demoSection}>
-          <AppText variant="h3" style={styles.demoTitle}>
-            {LOGIN_SCREEN.demoSectionTitle}
-          </AppText>
-
-          <AppText variant="small" style={styles.demoSubtitle}>
-            {LOGIN_SCREEN.demoSectionSubtitle}
-          </AppText>
-
-          {DEMO_USERS.map((user) => (
-            <DemoAccountCard
-              key={user.id}
-              title={user.fullName}
-              phoneNumber={user.phoneNumber}
-              role={user.role}
-              icon={getRoleIcon(user.role)}
-              onPress={selectDemoAccount}
-            />
-          ))}
-        </View>
       </View>
+
     </AuthenticationLayout>
+
   );
+
 }
 
-LoginScreen.displayName = "LoginScreen";
+LoginScreen.displayName = 'LoginScreen';

@@ -3,152 +3,102 @@
  * Authentication Service
  * ============================================================================
  *
- * Handles authentication logic.
+ * Every authentication request goes through this service.
  *
- * NOTE:
- * -----
- * This implementation uses demo users.
- * Later it will communicate with the Node.js backend.
+ * Screens should never communicate with Supabase directly.
+ *
  * ============================================================================
  */
 
-import { DEMO_OTP, DEMO_USERS } from '../constants/demoUsers';
+import { supabase } from '@/services/supabase/client';
 
 import type {
-  AuthSession,
-  AuthUser,
+  LoginPayload,
+  VerifyOtpPayload,
 } from '../types/auth.types';
-
-import { authStorage } from '../storage/auth.storage'
 
 class AuthService {
 
-  private session: AuthSession | null = null;
-
   /**
-   * Login
+   * --------------------------------------------------------------------------
+   * Send Email OTP
+   * --------------------------------------------------------------------------
    */
 
-  async login(phoneNumber: string): Promise<AuthUser> {
+  async signInWithEmail({
+    email,
+  }: LoginPayload) {
 
-    await this.delay();
+    return supabase.auth.signInWithOtp({
 
-    const user = DEMO_USERS.find(
-      (user) => user.phoneNumber === phoneNumber,
-    );
+      email,
 
-    if (!user) {
+      options: {
 
-      throw new Error('User not found.');
+        shouldCreateUser: true,
 
-    }
+      },
 
-    return user;
+    });
 
   }
 
   /**
-   * Verify OTP
+   * --------------------------------------------------------------------------
+   * Verify Email OTP
+   * --------------------------------------------------------------------------
    */
 
-  async verifyOtp(
-    user: AuthUser,
-    otp: string,
-  ): Promise<AuthSession> {
+  async verifyOtp({
+    email,
+    token,
+  }: VerifyOtpPayload) {
 
-    await this.delay();
+    return supabase.auth.verifyOtp({
 
-    if (otp !== DEMO_OTP) {
+      email,
 
-      throw new Error('Invalid verification code.');
+      token,
 
-    }
+      type: 'email',
 
-    this.session = {
-
-      token: 'demo-token',
-
-      user,
-
-    };
-
-    await authStorage.saveSession(this.session);
-
-    return this.session;
+    });
 
   }
 
   /**
-   * Logout
-   */
-
-  async logout() {
-
-    await authStorage.clearSession();
-    this.session = null;
-
-  }
-
-  /**
+   * --------------------------------------------------------------------------
    * Current Session
+   * --------------------------------------------------------------------------
    */
 
-  getSession() {
+  async getSession() {
 
-    return this.session;
+    return supabase.auth.getSession();
 
   }
 
   /**
- * Restore Session
- */
-
-async restoreSession() {
-
-  const session =
-    await authStorage.getSession();
-
-  if (!session) {
-
-    return null;
-
-  }
-
-  this.session = session;
-
-  return session;
-
-}
-
-  /**
+   * --------------------------------------------------------------------------
    * Current User
+   * --------------------------------------------------------------------------
    */
 
-  getCurrentUser() {
+  async getUser() {
 
-    return this.session?.user ?? null;
+    return supabase.auth.getUser();
 
   }
 
   /**
-   * Authentication Status
+   * --------------------------------------------------------------------------
+   * Logout
+   * --------------------------------------------------------------------------
    */
 
-  isAuthenticated() {
+  async signOut() {
 
-    return this.session !== null;
-
-  }
-
-  /**
-   * Simulate API Request
-   */
-
-  private async delay() {
-
-    return new Promise((resolve) =>
-      setTimeout(resolve, 800),
-    );
+    return supabase.auth.signOut();
 
   }
 
