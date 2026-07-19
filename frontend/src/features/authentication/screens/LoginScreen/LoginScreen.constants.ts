@@ -1,12 +1,13 @@
 export const LOGIN_SCREEN = {
 
-  title: 'Welcome Back',
+  title: 'Welcome to Pamoja Chama',
 
   subtitle:
-    'Enter your email address to receive a secure verification code.',
+
+    'Enter your email address and we will send you a secure verification code.',
 
   emailPlaceholder: 'Email address',
 
-  continueButton: 'Continue',
+  continueButton: 'Send Verification Code',
 
 };

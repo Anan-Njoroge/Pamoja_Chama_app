@@ -8,6 +8,8 @@ import {
 
   AppInput,
 
+  AppText,
+
 } from '@/components/ui';
 
 import { AuthenticationLayout } from '../../components/AuthenticationLayout';
@@ -29,6 +31,8 @@ export function OtpScreen() {
     verifyOtp,
 
     loading,
+
+    error,
 
   } = useVerifyOtp();
 
@@ -56,7 +60,25 @@ export function OtpScreen() {
 
           maxLength={6}
 
+          leftIcon="lock"
+
         />
+
+        {error && (
+
+          <AppText
+
+            variant="small"
+
+            color="danger"
+
+          >
+
+            {error}
+
+          </AppText>
+
+        )}
 
         <AppButton
 

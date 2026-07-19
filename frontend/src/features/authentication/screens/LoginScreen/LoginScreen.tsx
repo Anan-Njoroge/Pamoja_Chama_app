@@ -4,6 +4,8 @@
  * ============================================================================
  *
  * Sends an Email OTP using Supabase Authentication.
+ *
+ * ============================================================================
  */
 
 import React from 'react';
@@ -15,6 +17,8 @@ import {
   AppButton,
 
   AppInput,
+
+  AppText,
 
 } from '@/components/ui';
 
@@ -37,6 +41,8 @@ export function LoginScreen() {
     continueLogin,
 
     loading,
+
+    error,
 
   } = useLogin();
 
@@ -66,11 +72,29 @@ export function LoginScreen() {
 
           autoCorrect={false}
 
+          autoComplete="email"
+
           leftIcon="mail"
 
           containerStyle={styles.input}
 
         />
+
+        {error && (
+
+          <AppText
+
+            variant="small"
+
+            color="danger"
+
+          >
+
+            {error}
+
+          </AppText>
+
+        )}
 
         <AppButton
 

@@ -1,12 +1,13 @@
 export const OTP_SCREEN = {
 
-    title: 'Verify Email',
+    title: 'Verify Your Email',
   
     subtitle:
-      'Enter the 6-digit code sent to your email.',
+  
+      'Enter the six-digit verification code sent to your email.',
   
     placeholder: '123456',
   
-    button: 'Verify',
+    button: 'Verify & Continue',
   
   };
