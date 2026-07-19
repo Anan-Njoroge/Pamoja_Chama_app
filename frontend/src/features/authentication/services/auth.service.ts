@@ -3,9 +3,18 @@
  * Authentication Service
  * ============================================================================
  *
- * Every authentication request goes through this service.
+ * PURPOSE
+ * -------
+ * The only layer responsible for communicating with Supabase Authentication.
  *
- * Screens should never communicate with Supabase directly.
+ * Responsibilities:
+ *
+ * • Send Email OTP
+ * • Verify Email OTP
+ * • Get Current Session
+ * • Get Current User
+ * • Sign Out
+ * • Listen for Authentication Changes
  *
  * ============================================================================
  */
@@ -13,21 +22,26 @@
 import { supabase } from '@/services/supabase/client';
 
 import type {
-  LoginPayload,
-  VerifyOtpPayload,
+
+  LoginRequest,
+
+  VerifyOtpRequest,
+
 } from '../types/auth.types';
 
 class AuthService {
 
   /**
    * --------------------------------------------------------------------------
-   * Send Email OTP
+   * Send Email Verification Code
    * --------------------------------------------------------------------------
    */
 
   async signInWithEmail({
+
     email,
-  }: LoginPayload) {
+
+  }: LoginRequest) {
 
     return supabase.auth.signInWithOtp({
 
@@ -50,9 +64,12 @@ class AuthService {
    */
 
   async verifyOtp({
+
     email,
+
     token,
-  }: VerifyOtpPayload) {
+
+  }: VerifyOtpRequest) {
 
     return supabase.auth.verifyOtp({
 
@@ -99,6 +116,18 @@ class AuthService {
   async signOut() {
 
     return supabase.auth.signOut();
+
+  }
+
+  /**
+   * --------------------------------------------------------------------------
+   * Listen For Auth Changes
+   * --------------------------------------------------------------------------
+   */
+
+  onAuthStateChange(callback: Parameters<typeof supabase.auth.onAuthStateChange>[0]) {
+
+    return supabase.auth.onAuthStateChange(callback);
 
   }
 
