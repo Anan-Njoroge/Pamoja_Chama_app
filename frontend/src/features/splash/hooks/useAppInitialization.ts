@@ -1,31 +1,75 @@
-import { useEffect, useState } from 'react';
+/**
+ * ============================================================================
+ * App Initialisation
+ * ============================================================================
+ */
+
+import {
+
+  useEffect,
+
+} from 'react';
+
+import {
+
+  router,
+
+} from 'expo-router';
+
+import {
+
+  authService,
+
+} from '@/features/authentication';
 
 export function useAppInitialization() {
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    async function initialize() {
-      /**
-       * Future initialization:
-       *
-       * ✓ Restore login session
-       * ✓ Load cached user
-       * ✓ Initialize notifications
-       * ✓ Configure API
-       * ✓ Load remote config
-       */
 
-      await new Promise(resolve =>
-        setTimeout(resolve, 1800)
-      );
+    let mounted = true;
 
-      setIsReady(true);
+    async function initialise() {
+
+      await new Promise<void>((resolve) => {
+
+        setTimeout(resolve, 2500);
+
+      });
+
+      const {
+
+        data,
+
+      } = await authService.getSession();
+
+      if (!mounted) {
+
+        return;
+
+      }
+
+      if (data.session) {
+
+        router.replace('/(main)');
+
+      }
+
+      else {
+
+        router.replace('/(auth)/login');
+
+      }
+
     }
 
-    initialize();
+    initialise();
+
+    return () => {
+
+      mounted = false;
+
+    };
+
   }, []);
 
-  return {
-    isReady,
-  };
 }

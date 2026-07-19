@@ -1,27 +1,102 @@
 /**
  * ============================================================================
- * Secure Storage Adapter
+ * Supabase Storage
  * ============================================================================
  *
- * Stores Supabase authentication sessions securely on the device.
+ * Native
+ * -------
+ * SecureStore
+ *
+ * Web
+ * ---
+ * localStorage
+ *
+ * SSR
+ * ---
+ * In-memory (no-op)
  *
  * ============================================================================
  */
 
+import { Platform } from 'react-native';
+
 import * as SecureStore from 'expo-secure-store';
 
+const isBrowser =
+  typeof window !== 'undefined';
+
 export const secureStorage = {
+  async getItem(
+    key: string,
+  ): Promise<string | null> {
 
-  getItem: (key: string) =>
+    if (Platform.OS === 'web') {
 
-    SecureStore.getItemAsync(key),
+      if (!isBrowser) {
 
-  setItem: (key: string, value: string) =>
+        return null;
 
-    SecureStore.setItemAsync(key, value),
+      }
 
-  removeItem: (key: string) =>
+      return window.localStorage.getItem(key);
 
-    SecureStore.deleteItemAsync(key),
+    }
+
+    return SecureStore.getItemAsync(key);
+
+  },
+
+  async setItem(
+    key: string,
+    value: string,
+  ): Promise<void> {
+
+    if (Platform.OS === 'web') {
+
+      if (!isBrowser) {
+
+        return;
+
+      }
+
+      window.localStorage.setItem(
+        key,
+        value,
+      );
+
+      return;
+
+    }
+
+    await SecureStore.setItemAsync(
+      key,
+      value,
+    );
+
+  },
+
+  async removeItem(
+    key: string,
+  ): Promise<void> {
+
+    if (Platform.OS === 'web') {
+
+      if (!isBrowser) {
+
+        return;
+
+      }
+
+      window.localStorage.removeItem(key);
+
+      return;
+
+    }
+
+    await SecureStore.deleteItemAsync(
+      key,
+    );
+
+  },
 
 };

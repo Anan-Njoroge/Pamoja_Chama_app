@@ -5,21 +5,18 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+
 import { secureStorage } from './storage';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey =
-  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const url =
+  process.env.EXPO_PUBLIC_SUPABASE_URL!;
 
-if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Check your .env file.',
-  );
-}
+const key =
+  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
 export const supabase = createClient(
-  supabaseUrl,
-  supabasePublishableKey,
+  url,
+  key,
   {
     auth: {
       storage: secureStorage,

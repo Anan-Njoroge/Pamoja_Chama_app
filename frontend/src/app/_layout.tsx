@@ -3,21 +3,13 @@
  * Root Layout
  * ============================================================================
  *
- * PURPOSE
- * -------
- * This is the application's root component.
+ * Loads fonts and registers the application's providers.
  *
- * Responsibilities
- * ----------------
- * • Load application fonts
- * • Keep the native splash screen visible while loading
- * • Register global providers
- * • Configure Expo Router navigation
+ * The native splash screen is intentionally NOT hidden here.
+ * It is hidden inside the custom splash screen so the transition is seamless.
  *
  * ============================================================================
  */
-
-import { useCallback } from 'react';
 
 import { Stack } from 'expo-router';
 
@@ -43,9 +35,6 @@ import {
 
 import { AppProviders } from '@/providers';
 
-// Keep the native splash screen visible
-// until the application is ready.
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -62,27 +51,6 @@ export default function RootLayout() {
 
   });
 
-  /**
-   * Hide the native splash screen once
-   * the application has finished loading.
-   */
-
-  const onLayoutRootView = useCallback(
-
-    async () => {
-
-      if (fontsLoaded) {
-
-        await SplashScreen.hideAsync();
-
-      }
-
-    },
-
-    [fontsLoaded],
-
-  );
-
   if (!fontsLoaded) {
 
     return null;
@@ -91,7 +59,7 @@ export default function RootLayout() {
 
   return (
 
-    <SafeAreaProvider onLayout={onLayoutRootView}>
+    <SafeAreaProvider>
 
       <AppProviders>
 

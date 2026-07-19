@@ -1,139 +1,100 @@
 /**
  * ============================================================================
- * SplashScreen
- * ============================================================================
- *
- * Displays the branded splash experience while the application initializes.
- *
- * Responsibilities:
- *
- * ✓ Shows the Pamoja logo
- * ✓ Displays application name
- * ✓ Shows tagline
- * ✓ Indicates loading progress
- * ✓ Navigates when initialization completes
- *
+ * Splash Screen
  * ============================================================================
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, {
+
+  useEffect,
+
+} from 'react';
 
 import {
-  Animated,
-  Image,
-  StyleSheet,
+
   View,
+
 } from 'react-native';
 
-import { router } from 'expo-router';
+import * as ExpoSplashScreen from 'expo-splash-screen';
 
-import { AppLoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { AppText } from '@/components/ui/Text';
+import {
 
-import { Colors, Spacing } from '@/theme';
+  AppScreen,
 
-import { useAppInitialization } from './hooks/useAppInitialization';
+  AppText,
+
+} from '@/components/ui';
+
+import {
+
+  AnimatedLogo,
+
+} from './components';
+
+import {
+
+  useAppInitialization,
+
+} from './hooks/useAppInitialization';
 
 export function SplashScreen() {
-  const { isReady } = useAppInitialization();
 
-  const opacity = useRef(new Animated.Value(0)).current;
+  /**
+   * Hide the native splash once this screen
+   * has mounted.
+   */
 
   useEffect(() => {
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 700,
-      useNativeDriver: true,
-    }).start();
+
+    ExpoSplashScreen.hideAsync();
+
   }, []);
 
-  useEffect(() => {
-
-    if (!isReady) {
-  
-      return;
-  
-    }
-  
-    router.replace('/');
-  
-  }, [isReady]);
+  useAppInitialization();
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity,
-          },
-        ]}
+
+    <AppScreen>
+
+      <View
+
+        style={{
+
+          flex: 1,
+
+          justifyContent: 'center',
+
+          alignItems: 'center',
+
+        }}
+
       >
-        <Image
-          source={require('../../../assets/splash/splash-icon.png')}
-          resizeMode="contain"
-          style={styles.logo}
-        />
+
+        <AnimatedLogo />
 
         <AppText
-          variant="h1"
-          color="white"
-          style={styles.title}
+
+          variant="h2"
+
         >
+
           Pamoja Chama
+
         </AppText>
 
-        <AppText
-          variant="body"
-          color="white"
-          style={styles.subtitle}
-        >
-          Building stronger communities together.
+        <AppText>
+
+          Empowering Community Savings
+
         </AppText>
 
-        <AppLoadingSpinner
-          label="Preparing your workspace..."
-          style={styles.spinner}
-          labelColor = "white"
-          spinnerColor="white"
-        />
-      </Animated.View>
-    </View>
+      </View>
+
+    </AppScreen>
+
   );
+
 }
 
 SplashScreen.displayName = 'SplashScreen';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
-  },
-
-  content: {
-    width: '100%',
-    alignItems: 'center',
-  },
-
-  logo: {
-    width: 200,
-    height: 200,
-    marginBottom: Spacing.xl,
-  },
-
-  title: {
-    textAlign: 'center',
-  },
-
-  subtitle: {
-    marginTop: Spacing.sm,
-    textAlign: 'center',
-  },
-
-  spinner: {
-    marginTop: Spacing.xxxl,
-  },
-});
