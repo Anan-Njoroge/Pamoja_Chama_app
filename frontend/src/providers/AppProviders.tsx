@@ -1,48 +1,47 @@
 /**
  * ============================================================================
- * App Providers
+ * Application Providers
  * ============================================================================
  *
- * Registers every application-wide provider.
+ * PURPOSE
+ * -------
+ * Registers every global provider required by the application.
+ *
+ * Current Providers
+ * -----------------
+ * • Authentication
+ *
+ * Future Providers
+ * ----------------
+ * • React Query
+ * • Theme
+ * • Toast
+ * • Modal
+ * ============================================================================
  */
 
-import React from 'react';
-
-import {
-  SafeAreaProvider,
-} from 'react-native-safe-area-context';
+import type {
+  PropsWithChildren,
+} from 'react';
 
 import {
   AuthProvider,
-} from '@/features/authentication/context';
-
-interface AppProvidersProps {
-
-  children: React.ReactNode;
-
-}
+} from '@/features/authentication';
 
 export function AppProviders({
-
   children,
-
-}: AppProvidersProps) {
+}: PropsWithChildren) {
 
   return (
 
-    <SafeAreaProvider>
+    <AuthProvider>
 
-      <AuthProvider>
+      {children}
 
-        {children}
-
-      </AuthProvider>
-
-    </SafeAreaProvider>
+    </AuthProvider>
 
   );
 
 }
 
-AppProviders.displayName =
-  'AppProviders';
+AppProviders.displayName = 'AppProviders';

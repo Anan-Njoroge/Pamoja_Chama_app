@@ -1,163 +1,163 @@
+/**
+ * ============================================================================
+ * Authentication Provider
+ * ============================================================================
+ *
+ * PURPOSE
+ * -------
+ * Central authentication state for the application.
+ *
+ * Responsibilities
+ * ----------------
+ * • Restore previous session
+ * • Listen for authentication changes
+ * • Expose authenticated user
+ * • Expose current session
+ * • Provide sign out functionality
+ *
+ * ============================================================================
+ */
+
 import React, {
   useEffect,
   useMemo,
   useState,
 } from 'react';
 
+import type {
+  PropsWithChildren,
+} from 'react';
+
+import type {
+  Session,
+  User,
+} from '@supabase/supabase-js';
+
 import { AuthContext } from './AuthContext';
 
-import { authService } from '../services/auth.service';
-
-import type {
-  AuthSession,
-  AuthUser,
-} from '../types/auth.types';
-
-import type {
-  AuthContextValue,
-} from './AuthContext.types';
-
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
+import { authService } from '../services';
 
 export function AuthProvider({
   children,
-}: AuthProviderProps) {
+}: PropsWithChildren) {
+
   const [user, setUser] =
-    useState<AuthUser | null>(null);
+    useState<User | null>(null);
 
   const [session, setSession] =
-    useState<AuthSession | null>(null);
+    useState<Session | null>(null);
 
   const [loading, setLoading] =
     useState(true);
 
   /**
-   * Stores the phone number while the user is
-   * moving between Login and OTP verification.
+   * --------------------------------------------------------------------------
+   * Restore Existing Session
+   * --------------------------------------------------------------------------
    */
-  const [
-    pendingPhoneNumber,
-    setPendingPhoneNumber,
-  ] = useState<string | null>(null);
 
-  async function login(
-    phoneNumber: string,
-  ) {
-    setLoading(true);
+  useEffect(() => {
 
-    try {
-      return await authService.login(
-        phoneNumber,
+    let mounted = true;
+
+    async function initialise() {
+
+      const { data } =
+        await authService.getSession();
+
+      if (!mounted) {
+        return;
+      }
+
+      setSession(data.session);
+
+      setUser(
+        data.session?.user ?? null,
       );
-    } finally {
+
       setLoading(false);
+
     }
-  }
 
-  async function verifyOtp(
-    currentUser: AuthUser,
-    otp: string,
-  ) {
-    setLoading(true);
+    initialise();
 
-    try {
-      const currentSession =
-        await authService.verifyOtp(
-          currentUser,
-          otp,
+    const {
+      data: listener,
+    } = authService.onAuthStateChange(
+      async (_event, session): Promise<void> => {
+
+        if (!mounted) {
+          return;
+        }
+
+        setSession(session);
+
+        setUser(
+          session?.user ?? null,
         );
 
-      setSession(currentSession);
+        setLoading(false);
 
-      setUser(currentSession.user);
+      },
+    );
 
-      /**
-       * OTP succeeded.
-       * No longer need the temporary phone number.
-       */
-      setPendingPhoneNumber(null);
-    } finally {
-      setLoading(false);
-    }
+    return () => {
+
+      mounted = false;
+
+      listener.subscription.unsubscribe();
+
+    };
+
+  }, []);
+
+  /**
+   * --------------------------------------------------------------------------
+   * Sign Out
+   * --------------------------------------------------------------------------
+   */
+
+  async function signOut(): Promise<void> {
+
+    await authService.signOut();
+
   }
 
   /**
- * Restore a previously authenticated session
- * when the application launches.
- */
-  useEffect(() => {
-    async function restore() {
+   * --------------------------------------------------------------------------
+   * Context Value
+   * --------------------------------------------------------------------------
+   */
 
-      try {
-        const restoredSession =
-          await authService.restoreSession();
+  const value = useMemo(
+    () => ({
 
-        if (restoredSession) {
-          setSession(restoredSession);
-          setUser(restoredSession.user);
-        }
+      user,
 
-      } finally {
-        setLoading(false);
-      }
-    }
+      session,
 
-    restore();
-  }, []);
+      loading,
 
-  async function logout() {
-    await authService.logout();
+      signOut,
 
-    setSession(null);
-
-    setUser(null);
-
-    setPendingPhoneNumber(null);
-  }
-
-  const value =
-    useMemo<AuthContextValue>(
-      () => ({
-        user,
-
-        session,
-
-        loading,
-
-        isAuthenticated:
-          session !== null,
-
-        pendingPhoneNumber,
-
-        setPendingPhoneNumber,
-
-        login,
-
-        verifyOtp,
-
-        logout,
-      }),
-      [
-        user,
-
-        session,
-
-        loading,
-
-        pendingPhoneNumber,
-      ],
-    );
+    }),
+    [
+      user,
+      session,
+      loading,
+    ],
+  );
 
   return (
-    <AuthContext.Provider
-      value={value}
-    >
+
+    <AuthContext.Provider value={value}>
+
       {children}
+
     </AuthContext.Provider>
+
   );
+
 }
 
-AuthProvider.displayName =
-  'AuthProvider';
+AuthProvider.displayName = 'AuthProvider';

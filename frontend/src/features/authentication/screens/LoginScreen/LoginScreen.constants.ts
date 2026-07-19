@@ -3,12 +3,10 @@ export const LOGIN_SCREEN = {
   title: 'Welcome Back',
 
   subtitle:
-    'Enter your email address to receive a verification code.',
+    'Enter your email address to receive a secure verification code.',
 
-  emailPlaceholder:
-    'Email Address',
+  emailPlaceholder: 'Email address',
 
-  continueButton:
-    'Send Verification Code',
+  continueButton: 'Continue',
 
 };

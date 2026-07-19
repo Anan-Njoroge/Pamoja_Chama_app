@@ -10,10 +10,4 @@ export const styles = StyleSheet.create({
 
   },
 
-  input: {
-
-    marginBottom: Spacing.md,
-
-  },
-
 });

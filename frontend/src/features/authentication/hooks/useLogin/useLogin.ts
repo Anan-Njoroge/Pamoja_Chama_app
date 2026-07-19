@@ -1,63 +1,99 @@
-import { useMemo, useState } from 'react';
+/**
+ * ============================================================================
+ * useLogin
+ * ============================================================================
+ *
+ * Sends the Email OTP using Supabase.
+ */
+
+import { useState } from 'react';
 
 import { router } from 'expo-router';
 
-import { useAuth } from '../../context/useAuth';
+import { authService } from '../../services';
 
-export function useLogin() {
-  const {
-    login,
-    loading,
-    setPendingPhoneNumber,
-  } = useAuth();
+import type { UseLoginReturn } from './useLogin.types';
 
-  const [phoneNumber, setPhoneNumber] =
-    useState('');
+export function useLogin(): UseLoginReturn {
 
-  /**
-   * Very simple MVP validation.
-   *
-   * Later we'll replace this with
-   * proper Kenyan phone validation.
-   */
-  const isValidPhoneNumber =
-    useMemo(() => {
-      return (
-        phoneNumber.trim().length >= 10
-      );
-    }, [phoneNumber]);
+  const [email, setEmail] = useState('');
+
+  const [loading, setLoading] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
 
   async function continueLogin() {
-    if (!isValidPhoneNumber) {
+
+    if (!email.trim()) {
+
+      setError('Please enter your email.');
+
       return;
+
     }
 
-    await login(phoneNumber);
+    try {
 
-    setPendingPhoneNumber(
-      phoneNumber,
-    );
+      setLoading(true);
 
-    router.push('/(auth)/otp');
-  }
+      setError(null);
 
-  function selectDemoAccount(
-    phone: string,
-  ) {
-    setPhoneNumber(phone);
+      const {
+
+        error,
+
+      } = await authService.signInWithEmail({
+
+        email,
+
+      });
+
+      if (error) {
+
+        throw error;
+
+      }
+
+      router.push({
+
+        pathname: '/(auth)/otp',
+
+        params: {
+
+          email,
+
+        },
+
+      });
+
+    }
+
+    catch (err: any) {
+
+      setError(err.message);
+
+    }
+
+    finally {
+
+      setLoading(false);
+
+    }
+
   }
 
   return {
+
+    email,
+
+    setEmail,
+
     loading,
 
-    phoneNumber,
-
-    setPhoneNumber,
-
-    isValidPhoneNumber,
+    error,
 
     continueLogin,
 
-    selectDemoAccount,
   };
+
 }

@@ -3,28 +3,20 @@
  * Login Screen
  * ============================================================================
  *
- * PURPOSE
- * -------
- * Entry point into the application.
- *
- * Users authenticate using their email address.
- *
- * This screen delegates business logic to useLogin(),
- * but temporarily includes a test button to verify that
- * Supabase Email OTP is working.
- *
- * ============================================================================
+ * Sends an Email OTP using Supabase Authentication.
  */
 
 import React from 'react';
-import { Alert, View } from 'react-native';
+
+import { View } from 'react-native';
 
 import {
-  AppButton,
-  AppInput,
-} from '@/components/ui';
 
-import { authService } from '../../services/auth.service';
+  AppButton,
+
+  AppInput,
+
+} from '@/components/ui';
 
 import { AuthenticationLayout } from '../../components/AuthenticationLayout';
 
@@ -42,59 +34,11 @@ export function LoginScreen() {
 
     setEmail,
 
+    continueLogin,
+
     loading,
 
   } = useLogin();
-
-  const testOtp = async () => {
-
-    try {
-
-      const { data, error } =
-        await authService.signInWithEmail({
-
-          email,
-
-        });
-
-      console.log(
-        'Supabase Response:',
-        data,
-      );
-
-      console.log(
-        'Supabase Error:',
-        error,
-      );
-
-      if (error) {
-
-        Alert.alert(
-          'Authentication Error',
-          error.message,
-        );
-
-        return;
-
-      }
-
-      Alert.alert(
-        'Success',
-        'Check your email for the verification code.',
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      Alert.alert(
-        'Unexpected Error',
-        'Something went wrong.',
-      );
-
-    }
-
-  };
 
   return (
 
@@ -114,7 +58,7 @@ export function LoginScreen() {
 
           onChangeText={setEmail}
 
-          placeholder="Enter your email"
+          placeholder={LOGIN_SCREEN.emailPlaceholder}
 
           keyboardType="email-address"
 
@@ -122,7 +66,7 @@ export function LoginScreen() {
 
           autoCorrect={false}
 
-          leftIcon="email"
+          leftIcon="mail"
 
           containerStyle={styles.input}
 
@@ -130,13 +74,11 @@ export function LoginScreen() {
 
         <AppButton
 
-          title="Send Verification Code"
+          title={LOGIN_SCREEN.continueButton}
 
           loading={loading}
 
-          onPress={testOtp}
-
-          style={styles.button}
+          onPress={continueLogin}
 
         />
 
