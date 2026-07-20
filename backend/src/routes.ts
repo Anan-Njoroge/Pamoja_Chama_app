@@ -1,25 +1,15 @@
 import { Router } from 'express';
 
-import { authRoutes } from './modules/auth';
-
-import { profileRoutes } from './modules/profile';
+import authRoutes from '@/modules/auth/routes/auth.routes';
+import profileRoutes from '@/modules/profile/routes/profile.routes';
+import groupsRoutes from '@/modules/groups/routes/groups.routes';
 
 const router = Router();
 
-router.use(
+router.use('/auth', authRoutes);
 
-  '/auth',
+router.use('/profile', profileRoutes);
 
-  authRoutes,
-
-);
-
-router.use(
-
-  '/profile',
-
-  profileRoutes,
-
-);
+router.use('/groups', groupsRoutes);
 
 export default router;

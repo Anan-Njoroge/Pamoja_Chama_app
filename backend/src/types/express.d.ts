@@ -1,21 +1,17 @@
-import 'express';
+import { AuthUser } from '@/shared/types';
 
 declare global {
+
   namespace Express {
 
     interface Request {
 
-      user?: {
-
-        id: string;
-
-        email: string;
-
-      };
+      user?: AuthUser;
 
     }
 
   }
+
 }
 
 export {};
