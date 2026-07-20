@@ -1,50 +1,60 @@
-import { supabase } from '@/config/database';
+import { BaseRepository } from '@/shared/database/BaseRepository';
 
 import { UpdateProfileDto } from '../types/profile.types';
 
-export class ProfileRepository {
+export class ProfileRepository extends BaseRepository {
 
   async findById(id: string) {
 
-    return supabase
+    const { data, error } =
+      await this.db
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-      .from('profiles')
+    this.handleError(
+      error,
+      'Unable to retrieve profile.',
+    );
 
-      .select('*')
-
-      .eq('id', id)
-
-      .single();
+    return this.ensureFound(
+      data,
+      'Profile not found.',
+    );
 
   }
 
   async updateProfile(
-
     id: string,
-
     dto: UpdateProfileDto,
-
   ) {
 
-    return supabase
+    const { data, error } =
+      await this.db
+        .from('profiles')
+        .update({
 
-      .from('profiles')
+          full_name: dto.fullName,
 
-      .update({
+          phone: dto.phone,
 
-        full_name: dto.fullName,
+          avatar_url: dto.avatarUrl,
 
-        phone: dto.phone,
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-        avatar_url: dto.avatarUrl,
+    this.handleError(
+      error,
+      'Unable to update profile.',
+    );
 
-      })
-
-      .eq('id', id)
-
-      .select()
-
-      .single();
+    return this.ensureFound(
+      data,
+      'Profile not found.',
+    );
 
   }
 
