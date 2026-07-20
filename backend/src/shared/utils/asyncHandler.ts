@@ -1,45 +1,34 @@
-/**
- * ============================================================================
- * Async Handler
- * ============================================================================
- */
-
-import type {
-
-  Request,
-
-  Response,
-
-  NextFunction,
-
-} from 'express';
-
-export function asyncHandler(
-
-  fn: (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => Promise<unknown>,
-
-) {
-
-  return (
-
-    req: Request,
-
-    res: Response,
-
-    next: NextFunction,
-
-  ) => {
-
-    Promise.resolve(
-
-      fn(req, res, next),
-
-    ).catch(next);
-
-  };
-
-}
+import {
+    Request,
+    Response,
+    NextFunction,
+    RequestHandler,
+  } from 'express';
+  
+  export function asyncHandler(
+    handler: (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) => Promise<unknown>,
+  ): RequestHandler {
+  
+    return (
+      req,
+      res,
+      next,
+    ) => {
+  
+      Promise
+        .resolve(
+          handler(
+            req,
+            res,
+            next,
+          ),
+        )
+        .catch(next);
+  
+    };
+  
+  }

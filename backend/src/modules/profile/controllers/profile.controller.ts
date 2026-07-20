@@ -1,9 +1,9 @@
 import {
     Request,
     Response,
-    NextFunction,
   } from 'express';
   
+  import { asyncHandler } from '@/shared/utils/asyncHandler';
   import { AppError } from '@/shared/errors/AppError';
   
   import { ProfileService } from '../services/profile.service';
@@ -14,19 +14,12 @@ import {
     private readonly service =
       new ProfileService();
   
-    /**
-     * ==========================================================================
-     * Get Authenticated User Profile
-     * ==========================================================================
-     */
+    getProfile = asyncHandler(
   
-    getProfile = async (
-      req: Request,
-      res: Response,
-      next: NextFunction,
-    ) => {
-  
-      try {
+      async (
+        req: Request,
+        res: Response,
+      ) => {
   
         const user = req.user;
   
@@ -54,29 +47,16 @@ import {
   
         });
   
-      }
+      },
   
-      catch (error) {
+    );
   
-        next(error);
+    updateProfile = asyncHandler(
   
-      }
-  
-    };
-  
-    /**
-     * ==========================================================================
-     * Update Authenticated User Profile
-     * ==========================================================================
-     */
-  
-    updateProfile = async (
-      req: Request,
-      res: Response,
-      next: NextFunction,
-    ) => {
-  
-      try {
+      async (
+        req: Request,
+        res: Response,
+      ) => {
   
         const user = req.user;
   
@@ -110,14 +90,8 @@ import {
   
         });
   
-      }
+      },
   
-      catch (error) {
-  
-        next(error);
-  
-      }
-  
-    };
+    );
   
   }
