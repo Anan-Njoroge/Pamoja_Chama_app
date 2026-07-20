@@ -25,3 +25,13 @@ export const createGroupSchema = z.object({
     .optional(),
 
 });
+
+export const inviteMemberSchema = z.object({
+
+  email: z
+
+    .string()
+
+    .email(),
+
+});

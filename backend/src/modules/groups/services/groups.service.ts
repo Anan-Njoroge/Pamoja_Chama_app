@@ -3,6 +3,7 @@ import { GroupsRepository } from '../repositories/groups.repository';
 import { toGroupDto } from '../mappers/groups.mapper';
 
 import { CreateGroupDto } from '../types/groups.types';
+import { AppError } from '@/shared/errors/AppError';
 
 export class GroupsService {
 
@@ -39,6 +40,25 @@ export class GroupsService {
 
   }
 
+  /**
+ * ============================================================================
+ * Get Group Members
+ * ============================================================================
+ */
+async getMembers(
+
+  groupId: string,
+
+) {
+
+  return this.repository.getMembers(
+
+    groupId,
+
+  );
+
+}
+
   async getGroups(
     userId: string,
   ) {
@@ -65,4 +85,63 @@ export class GroupsService {
 
   }
 
+  async inviteMember(
+
+    groupId: string,
+  
+    email: string,
+  
+  ) {
+  
+    const profile =
+  
+      await this.repository.findProfileByEmail(
+  
+        email,
+  
+      );
+  
+    if (!profile) {
+  
+      throw new AppError(
+  
+        'User not found.',
+  
+        404,
+  
+      );
+  
+    }
+  
+    const exists =
+  
+      await this.repository.memberExists(
+  
+        groupId,
+  
+        profile.id,
+  
+      );
+  
+    if (exists) {
+  
+      throw new AppError(
+  
+        'Member already exists.',
+  
+        400,
+  
+      );
+  
+    }
+  
+    return this.repository.inviteMember(
+  
+      groupId,
+  
+      profile.id,
+  
+    );
+  
+  }
 }

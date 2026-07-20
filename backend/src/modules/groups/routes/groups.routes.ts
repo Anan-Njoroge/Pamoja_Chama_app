@@ -1,42 +1,57 @@
 import { Router } from 'express';
 
-import { authMiddleware } from '@/middleware';
+import { authMiddleware } from '@/middleware/auth.middleware';
 
-import { GroupsController } from '../controllers/groups.controller';
+import {
+  createGroup,
+  getGroups,
+  getGroup,
+  inviteMember,
+  getMembers,
+} from '../controllers/groups.controller';
 
 const router = Router();
 
-const controller =
-  new GroupsController();
+/**
+ * All Group routes require authentication.
+ */
+router.use(authMiddleware);
+
+/**
+ * ============================================================================
+ * Groups
+ * ============================================================================
+ */
 
 router.post(
-
   '/',
-
-  authMiddleware,
-
-  controller.createGroup,
-
+  createGroup,
 );
 
 router.get(
-
   '/',
-
-  authMiddleware,
-
-  controller.getGroups,
-
+  getGroups,
 );
 
 router.get(
-
   '/:id',
+  getGroup,
+);
 
-  authMiddleware,
+/**
+ * ============================================================================
+ * Members
+ * ============================================================================
+ */
 
-  controller.getGroup,
+router.get(
+  '/:id/members',
+  getMembers,
+);
 
+router.post(
+  '/:id/invite',
+  inviteMember,
 );
 
 export default router;
