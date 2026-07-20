@@ -1,52 +1,44 @@
 {
+  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    /* Language */
-    "target": "ES2022",
-    "lib": ["ES2022"],
+    // File Layout
+    // "rootDir": "./src",
+    // "outDir": "./dist",
 
-    /* Module */
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    "types": [],
+    // For nodejs:
+    // "lib": ["esnext"],
+    // "types": ["node"],
+    // and npm install -D @types/node
 
-    /* Output */
-    "rootDir": "./src",
-    "outDir": "./dist",
-
-    /* Path aliases */
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"]
-    },
-
-    /* Type Checking */
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
-
-    /* Interoperability */
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-
-    /* Project */
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    /* Source Maps */
+    // Other Outputs
     "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
 
-    /* Types */
-    "types": ["node"]
-  },
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
 
-  "include": [
-    "src/**/*",
-    "src/types/**/*.d.ts"
-  ],
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
 
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+    // Recommended Options
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  }
 }
