@@ -3,152 +3,131 @@
  * Authentication Service
  * ============================================================================
  *
- * Handles authentication logic.
+ * PURPOSE
+ * -------
+ * The only layer responsible for communicating with Supabase Authentication.
  *
- * NOTE:
- * -----
- * This implementation uses demo users.
- * Later it will communicate with the Node.js backend.
+ * Responsibilities:
+ *
+ * • Send Email OTP
+ * • Verify Email OTP
+ * • Get Current Session
+ * • Get Current User
+ * • Sign Out
+ * • Listen for Authentication Changes
+ *
  * ============================================================================
  */
 
-import { DEMO_OTP, DEMO_USERS } from '../constants/demoUsers';
+import { supabase } from '@/services/supabase/client';
 
 import type {
-  AuthSession,
-  AuthUser,
-} from '../types/auth.types';
 
-import { authStorage } from '../storage/auth.storage'
+  LoginRequest,
+
+  VerifyOtpRequest,
+
+} from '../types/auth.types';
 
 class AuthService {
 
-  private session: AuthSession | null = null;
-
   /**
-   * Login
+   * --------------------------------------------------------------------------
+   * Send Email Verification Code
+   * --------------------------------------------------------------------------
    */
 
-  async login(phoneNumber: string): Promise<AuthUser> {
+  async signInWithEmail({
 
-    await this.delay();
+    email,
 
-    const user = DEMO_USERS.find(
-      (user) => user.phoneNumber === phoneNumber,
-    );
+  }: LoginRequest) {
 
-    if (!user) {
+    return supabase.auth.signInWithOtp({
 
-      throw new Error('User not found.');
+      email,
 
-    }
+      options: {
 
-    return user;
+        shouldCreateUser: true,
+
+      },
+
+    });
 
   }
 
   /**
-   * Verify OTP
+   * --------------------------------------------------------------------------
+   * Verify Email OTP
+   * --------------------------------------------------------------------------
    */
 
-  async verifyOtp(
-    user: AuthUser,
-    otp: string,
-  ): Promise<AuthSession> {
+  async verifyOtp({
 
-    await this.delay();
+    email,
 
-    if (otp !== DEMO_OTP) {
+    token,
 
-      throw new Error('Invalid verification code.');
+  }: VerifyOtpRequest) {
 
-    }
+    return supabase.auth.verifyOtp({
 
-    this.session = {
+      email,
 
-      token: 'demo-token',
+      token,
 
-      user,
+      type: 'email',
 
-    };
-
-    await authStorage.saveSession(this.session);
-
-    return this.session;
+    });
 
   }
 
   /**
-   * Logout
-   */
-
-  async logout() {
-
-    await authStorage.clearSession();
-    this.session = null;
-
-  }
-
-  /**
+   * --------------------------------------------------------------------------
    * Current Session
+   * --------------------------------------------------------------------------
    */
 
-  getSession() {
+  async getSession() {
 
-    return this.session;
+    return supabase.auth.getSession();
 
   }
 
   /**
- * Restore Session
- */
-
-async restoreSession() {
-
-  const session =
-    await authStorage.getSession();
-
-  if (!session) {
-
-    return null;
-
-  }
-
-  this.session = session;
-
-  return session;
-
-}
-
-  /**
+   * --------------------------------------------------------------------------
    * Current User
+   * --------------------------------------------------------------------------
    */
 
-  getCurrentUser() {
+  async getUser() {
 
-    return this.session?.user ?? null;
+    return supabase.auth.getUser();
 
   }
 
   /**
-   * Authentication Status
+   * --------------------------------------------------------------------------
+   * Logout
+   * --------------------------------------------------------------------------
    */
 
-  isAuthenticated() {
+  async signOut() {
 
-    return this.session !== null;
+    return supabase.auth.signOut();
 
   }
 
   /**
-   * Simulate API Request
+   * --------------------------------------------------------------------------
+   * Listen For Auth Changes
+   * --------------------------------------------------------------------------
    */
 
-  private async delay() {
+  onAuthStateChange(callback: Parameters<typeof supabase.auth.onAuthStateChange>[0]) {
 
-    return new Promise((resolve) =>
-      setTimeout(resolve, 800),
-    );
+    return supabase.auth.onAuthStateChange(callback);
 
   }
 

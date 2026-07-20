@@ -1,1 +1,1 @@
-export { OtpScreen } from './OtpScreen';
+export * from './OtpScreen';

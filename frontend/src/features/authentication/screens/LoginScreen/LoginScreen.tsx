@@ -3,122 +3,115 @@
  * Login Screen
  * ============================================================================
  *
- * PURPOSE
- * -------
- * Entry point into the application.
- *
- * Users may:
- *
- * • Sign in with their phone number
- * • Choose a demo account for presentations
- *
- * The screen itself contains very little business logic.
- * Authentication is delegated to useLogin().
+ * Sends an Email OTP using Supabase Authentication.
  *
  * ============================================================================
  */
 
-import React from "react";
+import React from 'react';
 
-import { View } from "react-native";
+import { View } from 'react-native';
 
-import { AppButton, AppInput, AppText, AppDivider } from "@/components/ui";
+import {
 
-import { AuthenticationLayout } from "../../components/AuthenticationLayout";
+  AppButton,
 
-import { DemoAccountCard } from "../../components/DemoAccountCard";
+  AppInput,
 
-import { DEMO_USERS } from "../../constants/demoUsers";
+  AppText,
 
-import { LOGIN_SCREEN } from "./LoginScreen.constants";
+} from '@/components/ui';
 
-import { styles } from "./LoginScreen.styles";
+import { AuthenticationLayout } from '../../components/AuthenticationLayout';
 
-import { useLogin } from "../../hooks/useLogin";
+import { LOGIN_SCREEN } from './LoginScreen.constants';
 
-import type { IconName } from '@/components/ui';
+import { styles } from './LoginScreen.styles';
 
-function getRoleIcon(
-  role: string,
-): IconName {
-
-  switch (role) {
-
-    case 'treasurer':
-      return 'wallet';
-
-    case 'administrator':
-      return 'settings';
-
-    default:
-      return 'profile';
-
-  }
-
-}
+import { useLogin } from '../../hooks/useLogin';
 
 export function LoginScreen() {
-  const {
-    phoneNumber,
 
-    setPhoneNumber,
+  const {
+
+    email,
+
+    setEmail,
 
     continueLogin,
 
-    selectDemoAccount,
-
     loading,
+
+    error,
+
   } = useLogin();
 
   return (
+
     <AuthenticationLayout
+
       title={LOGIN_SCREEN.title}
+
       subtitle={LOGIN_SCREEN.subtitle}
+
     >
+
       <View style={styles.container}>
+
         <AppInput
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholder={LOGIN_SCREEN.phonePlaceholder}
-          keyboardType="phone-pad"
-          leftIcon="phone"
+
+          value={email}
+
+          onChangeText={setEmail}
+
+          placeholder={LOGIN_SCREEN.emailPlaceholder}
+
+          keyboardType="email-address"
+
+          autoCapitalize="none"
+
+          autoCorrect={false}
+
+          autoComplete="email"
+
+          leftIcon="mail"
+
           containerStyle={styles.input}
+
         />
+
+        {error && (
+
+          <AppText
+
+            variant="small"
+
+            color="danger"
+
+          >
+
+            {error}
+
+          </AppText>
+
+        )}
 
         <AppButton
+
           title={LOGIN_SCREEN.continueButton}
+
           loading={loading}
+
           onPress={continueLogin}
-          style={styles.button}
+
         />
 
-        <View style={styles.dividerContainer}>
-          <AppDivider label="OR" spacing="xl" />
-        </View>
-
-        <View style={styles.demoSection}>
-          <AppText variant="h3" style={styles.demoTitle}>
-            {LOGIN_SCREEN.demoSectionTitle}
-          </AppText>
-
-          <AppText variant="small" style={styles.demoSubtitle}>
-            {LOGIN_SCREEN.demoSectionSubtitle}
-          </AppText>
-
-          {DEMO_USERS.map((user) => (
-            <DemoAccountCard
-              key={user.id}
-              title={user.fullName}
-              phoneNumber={user.phoneNumber}
-              role={user.role}
-              icon={getRoleIcon(user.role)}
-              onPress={selectDemoAccount}
-            />
-          ))}
-        </View>
       </View>
+
     </AuthenticationLayout>
+
   );
+
 }
 
-LoginScreen.displayName = "LoginScreen";
+LoginScreen.displayName = 'LoginScreen';

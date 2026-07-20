@@ -1,12 +1,15 @@
 import {
-    createContext,
-  } from 'react';
-  
-  import type {
-    AuthContextValue,
-  } from './AuthContext.types';
-  
-  export const AuthContext =
-    createContext<AuthContextValue | undefined>(
-      undefined,
-    );
+
+  createContext,
+
+} from 'react';
+
+import type {
+
+  AuthContextType,
+
+} from '../types';
+
+export const AuthContext =
+
+  createContext<AuthContextType | null>(null);

@@ -2,47 +2,38 @@
  * ============================================================================
  * Authentication Types
  * ============================================================================
- *
- * Shared types used throughout the Authentication module.
  */
 
-export type UserRole =
-  | 'member'
-  | 'treasurer'
-  | 'administrator';
+import type {
 
-export interface AuthUser {
+  Session,
 
-  id: string;
+  User,
 
-  fullName: string;
-
-  phoneNumber: string;
-
-  role: UserRole;
-
-  groupId: string;
-
-}
+} from '@supabase/supabase-js';
 
 export interface LoginRequest {
 
-  phoneNumber: string;
+  email: string;
 
 }
 
 export interface VerifyOtpRequest {
 
-  phoneNumber: string;
-
-  otp: string;
-
-}
-
-export interface AuthSession {
+  email: string;
 
   token: string;
 
-  user: AuthUser;
+}
+
+export interface AuthContextType {
+
+  user: User | null;
+
+  session: Session | null;
+
+  loading: boolean;
+
+  signOut(): Promise<void>;
 
 }

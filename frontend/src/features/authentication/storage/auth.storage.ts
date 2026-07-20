@@ -3,65 +3,80 @@
  * Authentication Storage
  * ============================================================================
  *
- * Handles secure persistence of authentication sessions.
+ * PURPOSE
+ * -------
+ * Centralized helper for reading authentication information from Supabase.
  *
- * This is the only file that communicates with Expo SecureStore.
+ * NOTE
+ * ----
+ * We DO NOT manually store JWTs.
+ *
+ * Supabase already persists:
+ *
+ * • access token
+ * • refresh token
+ * • session
+ *
+ * using secureStorage.
+ *
+ * This helper simply exposes convenient methods used throughout
+ * the application.
+ *
  * ============================================================================
  */
-import { Platform } from 'react-native';
 
-import * as SecureStore from 'expo-secure-store';
-
-import type {
-
-  AuthSession,
-
-} from '../types/auth.types';
-
-const SESSION_KEY =
-  'pamoja-auth-session';
+import { supabase } from '@/services/supabase/client';
 
 class AuthStorage {
 
-  async saveSession(session: AuthSession) {
-    const value = JSON.stringify(session);
-  
-    if (Platform.OS === 'web') {
-      localStorage.setItem(SESSION_KEY, value);
-      return;
-    }
-  
-    await SecureStore.setItemAsync(SESSION_KEY, value);
+  /**
+   * --------------------------------------------------------------------------
+   * Current Session
+   * --------------------------------------------------------------------------
+   */
+
+  async getSession() {
+
+    const {
+
+      data,
+
+    } = await supabase.auth.getSession();
+
+    return data.session;
+
   }
 
-  async getSession(): Promise<AuthSession | null> {
-    try {
-      if (Platform.OS === 'web') {
-        const value = localStorage.getItem(SESSION_KEY);
-  
-        return value ? JSON.parse(value) : null;
-      }
-  
-      const value = await SecureStore.getItemAsync(
-        SESSION_KEY,
-      );
-  
-      return value ? JSON.parse(value) : null;
-    } catch {
-      return null;
-    }
+  /**
+   * --------------------------------------------------------------------------
+   * Current User
+   * --------------------------------------------------------------------------
+   */
+
+  async getUser() {
+
+    const {
+
+      data,
+
+    } = await supabase.auth.getUser();
+
+    return data.user;
+
   }
+
+  /**
+   * --------------------------------------------------------------------------
+   * Sign Out
+   * --------------------------------------------------------------------------
+   */
 
   async clearSession() {
-    if (Platform.OS === 'web') {
-      localStorage.removeItem(SESSION_KEY);
-      return;
-    }
-  
-    await SecureStore.deleteItemAsync(SESSION_KEY);
+
+    await supabase.auth.signOut();
+
   }
 
 }
 
-export const authStorage =
-  new AuthStorage();
+export const authStorage = new AuthStorage();

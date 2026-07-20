@@ -1,110 +1,93 @@
-/**
- * ============================================================================
- * OTP Screen
- * ============================================================================
- *
- * PURPOSE
- * -------
- * Allows the user to verify the one-time password before entering
- * the application.
- *
- * This screen contains presentation only.
- * All business logic lives inside useOtp().
- *
- * ============================================================================
- */
-
 import React from 'react';
 
-import {
-  View,
-} from 'react-native';
+import { View } from 'react-native';
 
 import {
+
   AppButton,
+
   AppInput,
+
   AppText,
+
 } from '@/components/ui';
 
-import {
-  AuthenticationLayout,
-} from '../../components/AuthenticationLayout';
+import { AuthenticationLayout } from '../../components/AuthenticationLayout';
 
-import {
-  OTP_SCREEN,
-} from './OtpScreen.constants';
+import { OTP_SCREEN } from './OtpScreen.constants';
 
-import {
-  styles,
-} from './OtpScreen.styles';
+import { styles } from './OtpScreen.styles';
 
-import {
-  useOtp,
-} from '../../hooks/useOtp';
+import { useVerifyOtp } from '../../hooks/useVerifyOtp';
 
 export function OtpScreen() {
 
   const {
 
-    otp,
+    code,
 
-    setOtp,
+    setCode,
 
-    verify,
-
-    resend,
-
-    canResend,
-
-    secondsRemaining,
+    verifyOtp,
 
     loading,
 
-  } = useOtp();
+    error,
+
+  } = useVerifyOtp();
 
   return (
 
     <AuthenticationLayout
+
       title={OTP_SCREEN.title}
+
       subtitle={OTP_SCREEN.subtitle}
+
     >
 
       <View style={styles.container}>
 
         <AppInput
-          value={otp}
-          onChangeText={setOtp}
+
+          value={code}
+
+          onChangeText={setCode}
+
           placeholder={OTP_SCREEN.placeholder}
+
           keyboardType="number-pad"
-          containerStyle={styles.otpInput}
+
           maxLength={6}
+
+          leftIcon="lock"
+
         />
 
+        {error && (
+
+          <AppText
+
+            variant="small"
+
+            color="danger"
+
+          >
+
+            {error}
+
+          </AppText>
+
+        )}
+
         <AppButton
-          title={OTP_SCREEN.verifyButton}
+
+          title={OTP_SCREEN.button}
+
           loading={loading}
-          fullWidth
-          onPress={verify}
-        />
 
-        <AppText
-          variant="small"
-          align="center"
-          style={styles.helperText}
-        >
+          onPress={verifyOtp}
 
-          {canResend
-            ? 'You can request another verification code.'
-            : `Resend available in ${secondsRemaining}s`}
-
-        </AppText>
-
-        <AppButton
-          title={OTP_SCREEN.resendButton}
-          variant="ghost"
-          fullWidth
-          onPress={resend}
-          disabled={!canResend}
         />
 
       </View>
@@ -115,5 +98,4 @@ export function OtpScreen() {
 
 }
 
-OtpScreen.displayName =
-  'OtpScreen';
+OtpScreen.displayName = 'OtpScreen';
