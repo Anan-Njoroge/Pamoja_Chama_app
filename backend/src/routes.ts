@@ -1,10 +1,12 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import authRoutes from "@/modules/auth/routes/auth.routes";
-import profileRoutes from "@/modules/profile/routes/profile.routes";
-import groupsRoutes from "@/modules/groups/routes/groups.routes";
-import contributionsRoutes from "@/modules/contributions/routes/contributions.routes";
-import notificationsRoutes from "@/modules/notifications/routes/notifications.routes";
+import authRoutes from '@/modules/auth/routes/auth.routes';
+import profileRoutes from '@/modules/profile/routes/profile.routes';
+import groupsRoutes from '@/modules/groups/routes/groups.routes';
+import contributionsRoutes from '@/modules/contributions/routes/contributions.routes';
+import notificationsRoutes from '@/modules/notifications/routes/notifications.routes';
+import reportsRoutes from '@/modules/reports/routes/reports.routes';
+
 
 const router = Router();
 
@@ -20,6 +22,11 @@ router.use(
   "/notifications",
 
   notificationsRoutes,
+);
+
+router.use(
+  '/reports',
+  reportsRoutes,
 );
 
 export default router;
