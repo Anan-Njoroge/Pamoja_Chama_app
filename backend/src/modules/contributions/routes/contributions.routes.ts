@@ -3,28 +3,67 @@ import { Router } from 'express';
 import { authMiddleware } from '@/middleware/auth.middleware';
 
 import {
-  getGroupContributions,
-  getMemberContributions,
-  recordContribution,
+
+  createContribution,
+
+  getMyContributions,
+
+  getPendingContributions,
+
+  approveContribution,
+
+  rejectContribution,
+
 } from '../controllers/contributions.controller';
 
 const router = Router();
 
 router.use(authMiddleware);
 
+/**
+ * ============================================================================
+ * Contributions
+ * ============================================================================
+ */
+
 router.post(
+
   '/',
-  recordContribution,
+
+  createContribution,
+
 );
 
 router.get(
-  '/group/:groupId',
-  getGroupContributions,
+
+  '/',
+
+  getMyContributions,
+
 );
 
 router.get(
-  '/member/:memberId',
-  getMemberContributions,
+
+  '/pending',
+
+  getPendingContributions,
+
+);
+
+router.patch(
+
+  '/:id/approve',
+
+  approveContribution,
+
+);
+
+router.patch(
+
+  '/:id/reject',
+
+  rejectContribution,
+
 );
 
 export default router;

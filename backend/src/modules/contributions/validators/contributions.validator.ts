@@ -4,14 +4,30 @@ export const createContributionSchema = z.object({
 
   groupId: z.string().uuid(),
 
-  memberId: z.string().uuid(),
+  contributionTypeId: z.string().uuid(),
+
+  paymentMethodId: z.string().uuid().optional(),
+
+  receiptNumber: z.string().trim().optional(),
 
   amount: z.number().positive(),
 
-  contributionDate: z.string(),
+  paymentDate: z.string().datetime().optional(),
 
-  paymentMethod: z.string(),
+  notes: z.string().max(500).optional(),
 
-  notes: z.string().optional(),
+});
+
+export const rejectContributionSchema = z.object({
+
+  rejectionReason: z
+
+    .string()
+
+    .trim()
+
+    .min(5)
+
+    .max(300),
 
 });
