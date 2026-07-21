@@ -1,6 +1,14 @@
 import { BaseRepository } from '@/shared/database/BaseRepository';
 
-import { CreateContributionDto } from '../types/contributions.types';
+import {
+  CreateContributionDto,
+  Contribution,
+} from '../types/contributions.types';
+
+type ContributionResult = {
+  data: Contribution | null;
+  error: any;
+};
 
 export class ContributionsRepository extends BaseRepository {
 
@@ -23,7 +31,10 @@ export class ContributionsRepository extends BaseRepository {
 
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: ContributionResult  =
       await this.db
         .from('contributions')
         .insert({
@@ -84,7 +95,10 @@ export class ContributionsRepository extends BaseRepository {
     id: string,
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: ContributionResult =
       await this.db
         .from('contributions')
         .select('*')
@@ -110,7 +124,13 @@ export class ContributionsRepository extends BaseRepository {
     memberId: string,
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: {
+      data: Contribution[] | null;
+      error: any;
+    }  =
       await this.db
         .from('contributions')
         .select('*')
@@ -136,7 +156,13 @@ export class ContributionsRepository extends BaseRepository {
     groupId: string,
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: {
+      data: Contribution[] | null;
+      error: any;
+    } =
       await this.db
         .from('contributions')
         .select('*')
@@ -167,7 +193,10 @@ export class ContributionsRepository extends BaseRepository {
 
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: ContributionResult =
       await this.db
         .from('contributions')
         .update({
@@ -210,7 +239,10 @@ export class ContributionsRepository extends BaseRepository {
 
   ) {
 
-    const { data, error } =
+    const {
+      data,
+      error,
+    }: ContributionResult =
       await this.db
         .from('contributions')
         .update({

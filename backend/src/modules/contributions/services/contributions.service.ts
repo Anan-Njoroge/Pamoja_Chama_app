@@ -8,12 +8,17 @@ import {
   CreateContributionDto,
 } from '../types/contributions.types';
 
+import { NotificationsService } from '@/modules/notifications/services/notifications.service';
+
 export class ContributionsService {
 
   constructor(
 
     private readonly repository =
       new ContributionsRepository(),
+
+    private readonly notifications =
+      new NotificationsService(),
 
   ) {}
 
@@ -55,7 +60,7 @@ export class ContributionsService {
     }
 
     /**
-     * Determine the user's role in this group
+     * Determine user's role
      */
     const membership =
       await this.repository.getMemberRole(
@@ -71,7 +76,7 @@ export class ContributionsService {
       membership.role === 'group_admin';
 
     /**
-     * Create contribution
+     * Record contribution
      */
     const contribution =
       await this.repository.createContribution(
@@ -91,6 +96,43 @@ export class ContributionsService {
           : undefined,
 
       );
+
+    /**
+     * Notifications
+     */
+    if (autoApprove) {
+
+      await this.notifications.createNotification(
+
+        currentUserId,
+
+        dto.groupId,
+
+        'contribution_approved',
+
+        'Contribution Recorded',
+
+        'The contribution has been recorded successfully.',
+
+      );
+
+    } else {
+
+      await this.notifications.createNotification(
+
+        currentUserId,
+
+        dto.groupId,
+
+        'contribution_recorded',
+
+        'Contribution Submitted',
+
+        'Your contribution has been submitted for approval.',
+
+      );
+
+    }
 
     return toContributionDto(
       contribution,
@@ -190,6 +232,23 @@ export class ContributionsService {
 
       );
 
+    /**
+     * Notify contributor
+     */
+    await this.notifications.createNotification(
+
+      updated.member_id,
+
+      updated.group_id,
+
+      'contribution_approved',
+
+      'Contribution Approved',
+
+      'Your contribution has been approved.',
+
+    );
+
     return toContributionDto(
       updated,
     );
@@ -245,6 +304,23 @@ export class ContributionsService {
         reason,
 
       );
+
+    /**
+     * Notify contributor
+     */
+    await this.notifications.createNotification(
+
+      updated.member_id,
+
+      updated.group_id,
+
+      'contribution_rejected',
+
+      'Contribution Rejected',
+
+      `Reason: ${reason}`,
+
+    );
 
     return toContributionDto(
       updated,
