@@ -144,6 +144,9 @@ Always use `expo install` instead of `npm install` for Expo packages.
 
 # 📦 npm Commands
 
+find . \( -path "./node_modules" -o -path "./dist" -o -path "./.git" \) -prune -o -print
+
+
 ## Install dependencies
 
 ```bash

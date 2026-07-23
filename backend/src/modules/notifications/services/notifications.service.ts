@@ -47,6 +47,48 @@ export class NotificationsService {
   }
 
   /**
+ * ============================================================================
+ * Notify Entire Group
+ * ============================================================================
+ */
+async createGroupNotification(
+
+  groupId: string,
+
+  type: string,
+
+  title: string,
+
+  message: string,
+
+) {
+
+  const members =
+    await this.repository.getGroupMembers(
+      groupId,
+    );
+
+  for (const member of members) {
+
+    await this.createNotification(
+
+      member.user_id,
+
+      groupId,
+
+      type,
+
+      title,
+
+      message,
+
+    );
+
+  }
+
+}
+
+  /**
    * ============================================================================
    * Get Notifications
    * ============================================================================
