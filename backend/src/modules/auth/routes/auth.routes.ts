@@ -1,16 +1,40 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from "../controllers/auth.controller";
+
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 const router = Router();
 
 const controller =
-  new AuthController();
+    new AuthController();
+
+/**
+ * ============================================================================
+ * Public
+ * ============================================================================
+ */
 
 router.post(
-  '/profile',
+    "/activate",
+    controller.activate,
+);
 
-  controller.createProfile,
+router.post(
+    "/login",
+    controller.login,
+);
+
+/**
+ * ============================================================================
+ * Protected
+ * ============================================================================
+ */
+
+router.post(
+    "/logout",
+    authMiddleware,
+    controller.logout,
 );
 
 export default router;

@@ -1,31 +1,95 @@
-import { supabase } from '@/config/database';
-
-import { CreateProfileDto } from '../types/auth.types';
+import { supabase } from "@/config/database";
 
 export class AuthRepository {
-  async findProfile(id: string) {
-    return supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', id)
-      .single();
+  async findByNationalId(nationalId: string) {
+    const { data, error } = await supabase
+
+      .from("profiles")
+
+      .select("*")
+
+      .eq("national_id", nationalId)
+
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return data;
   }
 
-  async createProfile(profile: CreateProfileDto) {
-    return supabase
-      .from('profiles')
-      .insert({
-        id: profile.id,
+  async saveActivationCode(
+    profileId: string,
 
-        email: profile.email,
+    codeHash: string,
 
-        full_name: profile.fullName,
+    expiresAt: string,
+  ) {
+    const { error } = await supabase
 
-        avatar_url: profile.avatarUrl,
+      .from("profiles")
 
-        default_role: 'member',
+      .update({
+        activation_code_hash: codeHash,
+
+        activation_expires_at: expiresAt,
+
+        account_status: "pending",
       })
+
+      .eq("id", profileId);
+
+    if (error) throw error;
+  }
+
+  async updateActivation(
+    profileId: string,
+
+    values: {
+      password_hash: string;
+
+      activation_code_hash: null;
+
+      activation_expires_at: null;
+
+      account_status: "active";
+    },
+  ) {
+    const { data, error } = await supabase
+
+      .from("profiles")
+
+      .update(values)
+
+      .eq("id", profileId)
+
       .select()
+
       .single();
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  async updateLogin(
+    profileId: string,
+
+    failedAttempts: number,
+
+    lastLogin: string,
+  ) {
+    const { error } = await supabase
+
+      .from("profiles")
+
+      .update({
+        failed_attempts: failedAttempts,
+
+        last_login_at: lastLogin,
+      })
+
+      .eq("id", profileId);
+
+    if (error) throw error;
   }
 }
