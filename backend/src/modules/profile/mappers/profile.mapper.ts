@@ -1,20 +1,58 @@
-import { ProfileDto } from '../types/profile.types';
+import {
 
-export function toProfileDto(profile: any): ProfileDto {
+  ProfileDto,
+
+} from "../types/profile.types";
+
+/**
+ * ============================================================================
+ * Profile Mapper
+ * ============================================================================
+ */
+
+export function toProfileDto(
+
+  profile: any,
+
+): ProfileDto {
 
   return {
 
-    id: profile.id,
+    id:
 
-    email: profile.email,
+      profile.id,
 
-    fullName: profile.full_name,
+    firstName:
 
-    phone: profile.phone,
+      profile.first_name,
 
-    avatarUrl: profile.avatar_url,
+    middleName:
 
-    defaultRole: profile.default_role,
+      profile.middle_name,
+
+    lastName:
+
+      profile.last_name,
+
+    phoneNumber:
+
+      profile.phone_number,
+
+    email:
+
+      profile.email,
+
+    nationalId:
+
+      profile.national_id,
+
+    accountStatus:
+
+      profile.account_status,
+
+    createdAt:
+
+      profile.created_at,
 
   };
 

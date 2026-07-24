@@ -1,30 +1,33 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { authMiddleware } from '@/middleware/auth.middleware';
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 import {
 
   getProfile,
-
   updateProfile,
 
-} from '../controllers/profile.controller';
+} from "../controllers/profile.controller";
 
 const router = Router();
 
-router.use(authMiddleware);
+router.use(
+
+  authMiddleware,
+
+);
 
 router.get(
 
-  '/',
+  "/",
 
   getProfile,
 
 );
 
-router.patch(
+router.put(
 
-  '/',
+  "/",
 
   updateProfile,
 

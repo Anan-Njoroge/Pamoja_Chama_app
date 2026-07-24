@@ -1,38 +1,62 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { authMiddleware } from '@/middleware/auth.middleware';
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 import {
 
+  deleteNotification,
   getNotifications,
+  getUnreadNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
 
-  markAsRead,
-
-} from '../controllers/notifications.controller';
+} from "../controllers/notifications.controller";
 
 const router = Router();
 
-router.use(authMiddleware);
+router.use(
 
-/**
- * ============================================================================
- * Notifications
- * ============================================================================
- */
+  authMiddleware,
+
+);
 
 router.get(
 
-  '/',
+  "/",
 
   getNotifications,
 
 );
 
+router.get(
+
+  "/unread",
+
+  getUnreadNotifications,
+
+);
+
 router.patch(
 
-  '/:id/read',
+  "/:id/read",
 
-  markAsRead,
+  markNotificationRead,
+
+);
+
+router.patch(
+
+  "/read-all",
+
+  markAllNotificationsRead,
+
+);
+
+router.delete(
+
+  "/:id",
+
+  deleteNotification,
 
 );
 

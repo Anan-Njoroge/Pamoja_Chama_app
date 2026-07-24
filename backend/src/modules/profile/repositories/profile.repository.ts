@@ -1,60 +1,72 @@
-import { BaseRepository } from '@/shared/database/BaseRepository';
+import { BaseRepository } from "@/shared/database/BaseRepository";
 
-import { UpdateProfileDto } from '../types/profile.types';
+import { UpdateProfileDto } from "../types/profile.types";
 
 export class ProfileRepository extends BaseRepository {
 
-  async findById(id: string) {
+  async findById(
+
+    profileId: string,
+
+  ) {
 
     const { data, error } =
+
       await this.db
-        .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
 
-    this.handleError(
-      error,
-      'Unable to retrieve profile.',
-    );
+        .from("profiles")
 
-    return this.ensureFound(
-      data,
-      'Profile not found.',
-    );
+        .select("*")
+
+        .eq("id", profileId)
+
+        .maybeSingle();
+
+    this.handleError(error);
+
+    return data;
 
   }
 
   async updateProfile(
-    id: string,
+
+    profileId: string,
+
     dto: UpdateProfileDto,
+
   ) {
 
     const { data, error } =
+
       await this.db
-        .from('profiles')
+
+        .from("profiles")
+
         .update({
 
-          full_name: dto.fullName,
+          first_name: dto.firstName,
 
-          phone: dto.phone,
+          middle_name: dto.middleName,
 
-          avatar_url: dto.avatarUrl,
+          last_name: dto.lastName,
+
+          phone_number: dto.phoneNumber,
+
+          email: dto.email,
+
+          national_id: dto.nationalId,
 
         })
-        .eq('id', id)
+
+        .eq("id", profileId)
+
         .select()
+
         .single();
 
-    this.handleError(
-      error,
-      'Unable to update profile.',
-    );
+    this.handleError(error);
 
-    return this.ensureFound(
-      data,
-      'Profile not found.',
-    );
+    return data;
 
   }
 

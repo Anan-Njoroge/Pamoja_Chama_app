@@ -1,22 +1,29 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const updateProfileSchema = z.object({
 
-  fullName: z
-    .string()
-    .min(2)
-    .max(100)
-    .optional(),
+  firstName:
 
-  phone: z
-    .string()
-    .regex(/^(\+254|0)[17]\d{8}$/)
-    .optional(),
+    z.string().min(2).optional(),
 
-  avatarUrl: z
-    .string()
-    .url()
-    .nullable()
-    .optional(),
+  middleName:
+
+    z.string().optional(),
+
+  lastName:
+
+    z.string().min(2).optional(),
+
+  phoneNumber:
+
+    z.string().optional(),
+
+  email:
+
+    z.string().email().optional(),
+
+  nationalId:
+
+    z.string().optional(),
 
 });

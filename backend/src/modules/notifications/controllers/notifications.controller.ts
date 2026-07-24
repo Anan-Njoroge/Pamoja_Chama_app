@@ -1,108 +1,213 @@
+import { Request, Response } from "express";
+
+import { AppError } from "@/shared/errors/AppError";
+
+import { asyncHandler } from "@/shared/utils/asyncHandler";
+
 import {
-    Request,
-    Response,
-  } from 'express';
-  
-  import { AppError } from '@/shared/errors/AppError';
-  import { asyncHandler } from '@/shared/utils/asyncHandler';
-  
-  import { NotificationsService } from '../services/notifications.service';
-  
-  const notificationsService =
-    new NotificationsService();
-  
-  /**
-   * ============================================================================
-   * Get Notifications
-   * ============================================================================
-   */
-  export const getNotifications = asyncHandler(
-  
+
+  success,
+
+} from "@/shared/utils/apiResponse";
+
+import { NotificationsService } from "../services/notifications.service";
+
+const notificationsService =
+  new NotificationsService();
+
+const param = (
+
+  value: string | string[] | undefined,
+
+): string => {
+
+  if (!value) {
+
+    throw new AppError(
+
+      "Missing parameter.",
+
+      400,
+
+    );
+
+  }
+
+  return Array.isArray(value)
+
+    ? value[0]
+
+    : value;
+
+};
+
+export const getNotifications =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-  
-          'Unauthorized.',
-  
+
+          "Unauthorized.",
+
           401,
-  
+
         );
-  
+
       }
-  
-      const notifications =
-  
-        await notificationsService.getNotifications(
-  
-          user.id,
-  
-        );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        data: notifications,
-  
-      });
-  
+
+      return success(
+
+        res,
+
+        await notificationsService.getUserNotifications(
+
+          req.user.id,
+
+        ),
+
+      );
+
     },
-  
+
   );
-  
-  /**
-   * ============================================================================
-   * Mark Notification Read
-   * ============================================================================
-   */
-  export const markAsRead = asyncHandler(
-  
+
+export const getUnreadNotifications =
+  asyncHandler(
+
     async (
-  
-      req: Request,
-  
-      res: Response,
-  
+
+      req,
+
+      res,
+
     ) => {
-  
-      const notificationId =
-  
-        Array.isArray(req.params.id)
-  
-          ? req.params.id[0]
-  
-          : req.params.id;
-  
-      const notification =
-  
-        await notificationsService.markAsRead(
-  
-          notificationId,
-  
+
+      if (!req.user) {
+
+        throw new AppError(
+
+          "Unauthorized.",
+
+          401,
+
         );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        message:
-  
-          'Notification marked as read.',
-  
-        data: notification,
-  
-      });
-  
+
+      }
+
+      return success(
+
+        res,
+
+        await notificationsService.getUnreadNotifications(
+
+          req.user.id,
+
+        ),
+
+      );
+
     },
-  
+
+  );
+
+export const markNotificationRead =
+  asyncHandler(
+
+    async (
+
+      req,
+
+      res,
+
+    ) => {
+
+      return success(
+
+        res,
+
+        await notificationsService.markAsRead(
+
+          param(req.params.id),
+
+        ),
+
+      );
+
+    },
+
+  );
+
+export const markAllNotificationsRead =
+  asyncHandler(
+
+    async (
+
+      req,
+
+      res,
+
+    ) => {
+
+      if (!req.user) {
+
+        throw new AppError(
+
+          "Unauthorized.",
+
+          401,
+
+        );
+
+      }
+
+      return success(
+
+        res,
+
+        await notificationsService.markAllAsRead(
+
+          req.user.id,
+
+        ),
+
+      );
+
+    },
+
+  );
+
+export const deleteNotification =
+  asyncHandler(
+
+    async (
+
+      req,
+
+      res,
+
+    ) => {
+
+      return success(
+
+        res,
+
+        await notificationsService.delete(
+
+          param(req.params.id),
+
+        ),
+
+      );
+
+    },
+
   );

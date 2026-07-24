@@ -1,8 +1,10 @@
-import { ProfileRepository } from '../repositories/profile.repository';
+import { AppError } from "@/shared/errors/AppError";
 
-import { toProfileDto } from '../mappers/profile.mapper';
+import { toProfileDto } from "../mappers/profile.mapper";
 
-import { UpdateProfileDto } from '../types/profile.types';
+import { ProfileRepository } from "../repositories/profile.repository";
+
+import { UpdateProfileDto } from "../types/profile.types";
 
 export class ProfileService {
 
@@ -13,27 +15,55 @@ export class ProfileService {
 
   ) {}
 
-  async getProfile(id: string) {
+  async getProfile(
+
+    profileId: string,
+
+  ) {
 
     const profile =
-      await this.repository.findById(id);
+
+      await this.repository.findById(
+
+        profileId,
+
+      );
+
+    if (!profile) {
+
+      throw new AppError(
+
+        "Profile not found.",
+
+        404,
+
+      );
+
+    }
 
     return toProfileDto(profile);
 
   }
 
   async updateProfile(
-    id: string,
+
+    profileId: string,
+
     dto: UpdateProfileDto,
+
   ) {
 
-    const profile =
+    const updated =
+
       await this.repository.updateProfile(
-        id,
+
+        profileId,
+
         dto,
+
       );
 
-    return toProfileDto(profile);
+    return toProfileDto(updated);
 
   }
 

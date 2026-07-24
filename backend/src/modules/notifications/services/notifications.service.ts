@@ -1,6 +1,10 @@
-import { NotificationsRepository } from '../repositories/notifications.repository';
+import { AppError } from "@/shared/errors/AppError";
 
-import { toNotificationDto } from '../mappers/notifications.mapper';
+import { toNotificationDto } from "../mappers/notifications.mapper";
+
+import { NotificationsRepository } from "../repositories/notifications.repository";
+
+import { CreateNotificationDto } from "../types/notifications.types";
 
 export class NotificationsService {
 
@@ -13,98 +17,84 @@ export class NotificationsService {
 
   /**
    * ============================================================================
-   * Create Notification
+   * Create
    * ============================================================================
    */
-  async createNotification(
 
-    userId: string,
+  async create(
 
-    groupId: string | null,
-
-    type: string,
-
-    title: string,
-
-    message: string,
+    dto: CreateNotificationDto,
 
   ) {
 
-    return this.repository.createNotification(
+    const notification =
 
-      userId,
+      await this.repository.createNotification(
 
-      groupId,
+        dto,
 
-      type,
+      );
 
-      title,
+    return toNotificationDto(
 
-      message,
-
-    );
-
-  }
-
-  /**
- * ============================================================================
- * Notify Entire Group
- * ============================================================================
- */
-async createGroupNotification(
-
-  groupId: string,
-
-  type: string,
-
-  title: string,
-
-  message: string,
-
-) {
-
-  const members =
-    await this.repository.getGroupMembers(
-      groupId,
-    );
-
-  for (const member of members) {
-
-    await this.createNotification(
-
-      member.user_id,
-
-      groupId,
-
-      type,
-
-      title,
-
-      message,
+      notification,
 
     );
 
   }
-
-}
 
   /**
    * ============================================================================
-   * Get Notifications
+   * User Notifications
    * ============================================================================
    */
-  async getNotifications(
+
+  async getUserNotifications(
+
     userId: string,
+
   ) {
 
     const notifications =
 
-      await this.repository.findByUser(
+      await this.repository.getUserNotifications(
+
         userId,
+
       );
 
     return notifications.map(
+
       toNotificationDto,
+
+    );
+
+  }
+
+  /**
+   * ============================================================================
+   * Unread
+   * ============================================================================
+   */
+
+  async getUnreadNotifications(
+
+    userId: string,
+
+  ) {
+
+    const notifications =
+
+      await this.repository.getUnreadNotifications(
+
+        userId,
+
+      );
+
+    return notifications.map(
+
+      toNotificationDto,
+
     );
 
   }
@@ -114,19 +104,126 @@ async createGroupNotification(
    * Mark Read
    * ============================================================================
    */
+
   async markAsRead(
-    id: string,
+
+    notificationId: string,
+
   ) {
 
     const notification =
 
+      await this.repository.findById(
+
+        notificationId,
+
+      );
+
+    if (!notification) {
+
+      throw new AppError(
+
+        "Notification not found.",
+
+        404,
+
+      );
+
+    }
+
+    const updated =
+
       await this.repository.markAsRead(
-        id,
+
+        notificationId,
+
       );
 
     return toNotificationDto(
-      notification,
+
+      updated,
+
     );
+
+  }
+
+  /**
+   * ============================================================================
+   * Mark All Read
+   * ============================================================================
+   */
+
+  async markAllAsRead(
+
+    userId: string,
+
+  ) {
+
+    await this.repository.markAllAsRead(
+
+      userId,
+
+    );
+
+    return {
+
+      success: true,
+
+      message:
+
+        "All notifications marked as read.",
+
+    };
+
+  }
+
+  /**
+   * ============================================================================
+   * Delete
+   * ============================================================================
+   */
+
+  async delete(
+
+    notificationId: string,
+
+  ) {
+
+    const notification =
+
+      await this.repository.findById(
+
+        notificationId,
+
+      );
+
+    if (!notification) {
+
+      throw new AppError(
+
+        "Notification not found.",
+
+        404,
+
+      );
+
+    }
+
+    await this.repository.deleteNotification(
+
+      notificationId,
+
+    );
+
+    return {
+
+      success: true,
+
+      message:
+
+        "Notification deleted successfully.",
+
+    };
 
   }
 

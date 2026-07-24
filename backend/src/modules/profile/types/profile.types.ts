@@ -1,25 +1,49 @@
+/**
+ * ============================================================================
+ * Update Profile DTO
+ * ============================================================================
+ */
+
 export interface UpdateProfileDto {
 
-    fullName?: string;
-  
-    phone?: string;
-  
-    avatarUrl?: string | null;
-  
-  }
-  
-  export interface ProfileDto {
-  
-    id: string;
-  
-    email: string;
-  
-    fullName: string;
-  
-    phone: string | null;
-  
-    avatarUrl: string | null;
-  
-    defaultRole: string;
-  
-  }
+  firstName?: string;
+
+  middleName?: string;
+
+  lastName?: string;
+
+  phoneNumber?: string;
+
+  email?: string;
+
+  nationalId?: string;
+
+}
+
+/**
+ * ============================================================================
+ * Profile DTO
+ * ============================================================================
+ */
+
+export interface ProfileDto {
+
+  id: string;
+
+  firstName: string;
+
+  middleName: string | null;
+
+  lastName: string;
+
+  phoneNumber: string | null;
+
+  email: string | null;
+
+  nationalId: string;
+
+  accountStatus: string;
+
+  createdAt: string;
+
+}

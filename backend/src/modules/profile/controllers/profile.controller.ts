@@ -1,127 +1,92 @@
-import {
+import { Request, Response } from "express";
 
-    Request,
-  
-    Response,
-  
-  } from 'express';
-  
-  import { asyncHandler } from '@/shared/utils/asyncHandler';
-  import { AppError } from '@/shared/errors/AppError';
-  
-  import { ProfileService } from '../services/profile.service';
-  import { updateProfileSchema } from '../validators/profile.validator';
-  
-  const profileService =
-    new ProfileService();
-  
-  /**
-   * ============================================================================
-   * Get Current User Profile
-   * ============================================================================
-   */
-  
-  export const getProfile = asyncHandler(
-  
+import { AppError } from "@/shared/errors/AppError";
+import { asyncHandler } from "@/shared/utils/asyncHandler";
+import {
+  success,
+} from "@/shared/utils/apiResponse";
+
+import { ProfileService } from "../services/profile.service";
+
+const profileService =
+  new ProfileService();
+
+export const getProfile =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-  
-          'Unauthorized.',
-  
+
+          "Unauthorized.",
+
           401,
-  
+
         );
-  
+
       }
-  
-      const profile =
+
+      return success(
+
+        res,
+
         await profileService.getProfile(
-  
-          user.id,
-  
-        );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        message: 'Profile retrieved successfully.',
-  
-        data: profile,
-  
-      });
-  
+
+          req.user.id,
+
+        ),
+
+      );
+
     },
-  
+
   );
-  
-  /**
-   * ============================================================================
-   * Update Current User Profile
-   * ============================================================================
-   */
-  
-  export const updateProfile = asyncHandler(
-  
+
+export const updateProfile =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-  
-          'Unauthorized.',
-  
+
+          "Unauthorized.",
+
           401,
-  
+
         );
-  
+
       }
-  
-      const dto =
-        updateProfileSchema.parse(
-  
-          req.body,
-  
-        );
-  
-      const profile =
+
+      return success(
+
+        res,
+
         await profileService.updateProfile(
-  
-          user.id,
-  
-          dto,
-  
-        );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        message: 'Profile updated successfully.',
-  
-        data: profile,
-  
-      });
-  
+
+          req.user.id,
+
+          req.body,
+
+        ),
+
+      );
+
     },
-  
+
   );
