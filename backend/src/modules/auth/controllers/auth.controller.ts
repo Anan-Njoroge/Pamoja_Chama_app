@@ -6,8 +6,8 @@ import {
 import { AuthService } from "../services/auth.service";
 
 import {
-  ActivateSchema,
-  LoginSchema,
+  activateSchema,
+  loginSchema,
 } from "../validators/auth.validator";
 
 import { success } from "@/shared/utils/apiResponse";
@@ -29,7 +29,7 @@ export class AuthController {
   ) => {
 
     const dto =
-      ActivateSchema.parse(
+      activateSchema.parse(
         req.body,
       );
 
@@ -56,7 +56,7 @@ export class AuthController {
   ) => {
 
     const dto =
-      LoginSchema.parse(
+      loginSchema.parse(
         req.body,
       );
 

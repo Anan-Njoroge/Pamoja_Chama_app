@@ -1,5 +1,5 @@
 export interface InviteMemberDto {
-
-    email: string;
-  
-  }
+  fullName: string;
+  nationalId: string;
+  phone: string;
+}

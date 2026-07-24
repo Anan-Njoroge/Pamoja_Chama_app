@@ -1,8 +1,19 @@
 import { AppError } from '@/shared/errors/AppError';
 
+import { AuthRepository } from '@/modules/auth/repositories/auth.repository';
+
+import {
+  generateActivationCode,
+  hashCode,
+} from '@/shared/security';
+
 import { toGroupDto } from '../mappers/groups.mapper';
 import { GroupsRepository } from '../repositories/groups.repository';
-import { CreateGroupDto } from '../types/groups.types';
+
+import {
+  CreateGroupDto,
+  InviteMemberDto,
+} from '../types/groups.types';
 
 export class GroupsService {
 
@@ -10,6 +21,9 @@ export class GroupsService {
 
     private readonly repository =
       new GroupsRepository(),
+
+    private readonly authRepository =
+      new AuthRepository(),
 
   ) {}
 
@@ -99,62 +113,132 @@ export class GroupsService {
    * ============================================================================
    * Invite Member
    * ============================================================================
+   *
+   * Treasurer onboarding flow:
+   *
+   * 1. Ensure National ID is unique.
+   * 2. Create profile.
+   * 3. Add member to group.
+   * 4. Generate activation code.
+   * 5. Hash activation code.
+   * 6. Save hash + expiry.
+   * 7. Return the plain activation code ONLY once.
    */
   async inviteMember(
 
     groupId: string,
 
-    email: string,
+    dto: InviteMemberDto,
 
   ) {
 
+    /**
+     * ------------------------------------------------------------------------
+     * National ID must be unique.
+     * ------------------------------------------------------------------------
+     */
+
+    const existing =
+      await this.authRepository.findByNationalId(
+
+        dto.nationalId,
+
+      );
+
+    if (existing) {
+
+      throw new AppError(
+
+        'National ID is already registered.',
+
+        409,
+
+      );
+
+    }
+
+    /**
+     * ------------------------------------------------------------------------
+     * Create profile.
+     * ------------------------------------------------------------------------
+     */
+
     const profile =
-      await this.repository.findProfileByEmail(
+      await this.repository.createProfile(
 
-        email,
-
-      );
-
-    if (!profile) {
-
-      throw new AppError(
-
-        'User not found.',
-
-        404,
+        dto,
 
       );
 
-    }
+    /**
+     * ------------------------------------------------------------------------
+     * Add member to the group.
+     * ------------------------------------------------------------------------
+     */
 
-    const exists =
-      await this.repository.memberExists(
-
-        groupId,
-
-        profile.id,
-
-      );
-
-    if (exists) {
-
-      throw new AppError(
-
-        'Member already exists.',
-
-        400,
-
-      );
-
-    }
-
-    return await this.repository.inviteMember(
+    await this.repository.addMemberToGroup(
 
       groupId,
 
       profile.id,
 
     );
+
+    /**
+     * ------------------------------------------------------------------------
+     * Generate activation code.
+     * ------------------------------------------------------------------------
+     */
+
+    const activationCode =
+      generateActivationCode();
+
+    const activationCodeHash =
+      await hashCode(
+
+        activationCode,
+
+      );
+
+    const expiresAt =
+      new Date(
+
+        Date.now()
+        + (7 * 24 * 60 * 60 * 1000),
+
+      ).toISOString();
+
+    /**
+     * ------------------------------------------------------------------------
+     * Save activation information.
+     * ------------------------------------------------------------------------
+     */
+
+    await this.authRepository.saveActivationCode(
+
+      profile.id,
+
+      activationCodeHash,
+
+      expiresAt,
+
+    );
+
+    /**
+     * ------------------------------------------------------------------------
+     * Return onboarding details.
+     * ------------------------------------------------------------------------
+     */
+
+    return {
+
+      member: profile,
+
+      activationCode,
+
+      expiresAt,
+
+    };
 
   }
 

@@ -10,6 +10,7 @@ export interface JwtPayload {
 export function generateAccessToken(
   payload: JwtPayload,
 ): string {
+
   return jwt.sign(
     payload,
     env.JWT_SECRET,
@@ -17,13 +18,16 @@ export function generateAccessToken(
       expiresIn: env.JWT_EXPIRES_IN,
     },
   );
+
 }
 
 export function verifyAccessToken(
   token: string,
 ): JwtPayload {
+
   return jwt.verify(
     token,
     env.JWT_SECRET,
   ) as JwtPayload;
+
 }

@@ -1,4 +1,4 @@
-import { GroupDto } from '../types/groups.types';
+import { GroupDto } from "../types/groups.types";
 
 export function toGroupDto(
   group: any,
@@ -10,15 +10,23 @@ export function toGroupDto(
 
     name: group.name,
 
-    description: group.description,
+    description:
+      group.description,
 
-    currency: group.currency,
+    currency:
+      group.currency,
 
-    meetingDay: group.meeting_day,
+    meetingDay:
+      group.meeting_day,
 
-    meetingTime: group.meeting_time,
+    meetingTime:
+      group.meeting_time,
 
-    createdBy: group.created_by,
+    createdBy:
+      group.created_by,
+
+    createdAt:
+      group.created_at,
 
   };
 

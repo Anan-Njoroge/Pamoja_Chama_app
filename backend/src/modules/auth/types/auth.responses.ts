@@ -1,21 +1,18 @@
 import {
-
-    AuthUser,
-
-} from "./auth.types";
-
-export interface AuthResponse {
-
+    AuthResponseDto,
+  } from "./auth.types";
+  
+  /**
+   * ============================================================================
+   * Standard Authentication Response
+   * ============================================================================
+   */
+  export interface AuthResponse {
+  
     success: boolean;
-
+  
     message: string;
-
-    data: {
-
-        accessToken: string;
-
-        user: AuthUser;
-
-    };
-
-}
+  
+    data: AuthResponseDto;
+  
+  }

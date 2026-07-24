@@ -1,6 +1,9 @@
 import { BaseRepository } from '@/shared/database/BaseRepository';
 
-import { CreateGroupDto } from '../types/groups.types';
+import {
+  CreateGroupDto,
+  InviteMemberDto,
+} from '../types/groups.types';
 
 export class GroupsRepository extends BaseRepository {
 
@@ -10,83 +13,118 @@ export class GroupsRepository extends BaseRepository {
    * ============================================================================
    */
   async createGroup(
-
     creatorId: string,
-
     dto: CreateGroupDto,
-
   ) {
 
     const { data, error } =
       await this.db
         .from('groups')
         .insert({
-
           name: dto.name,
-
           description: dto.description,
-
           currency: dto.currency,
-
           meeting_day: dto.meetingDay,
-
           meeting_time: dto.meetingTime,
-
           created_by: creatorId,
-
         })
         .select()
         .single();
 
     this.handleError(
-
       error,
-
       'Unable to create group.',
-
     );
 
-    return this.ensureFound(
-
-      data,
-
-    );
+    return this.ensureFound(data);
 
   }
 
   /**
    * ============================================================================
-   * Add Creator As Group Admin
+   * Register Group Creator
    * ============================================================================
    */
   async addCreatorAsAdmin(
-
     groupId: string,
-
     userId: string,
-
   ) {
 
     const { error } =
       await this.db
         .from('group_members')
         .insert({
-
           group_id: groupId,
-
           user_id: userId,
-
           role: 'group_admin',
-
+          status: 'active',
         });
 
     this.handleError(
-
       error,
-
       'Unable to register group creator.',
-
     );
+
+  }
+
+  /**
+   * ============================================================================
+   * Create Profile
+   * ============================================================================
+   */
+  async createProfile(
+    dto: InviteMemberDto,
+  ) {
+
+    const { data, error } =
+      await this.db
+        .from('profiles')
+        .insert({
+          full_name: dto.fullName,
+          national_id: dto.nationalId,
+          phone: dto.phone,
+          account_status: 'pending',
+        })
+        .select()
+        .single();
+
+    this.handleError(
+      error,
+      'Unable to create member profile.',
+    );
+
+    return this.ensureFound(data);
+
+  }
+
+  /**
+   * ============================================================================
+   * Add Member To Group
+   * ============================================================================
+   */
+  async addMemberToGroup(
+    groupId: string,
+    memberId: string,
+  ) {
+
+    const { data, error } =
+      await this.db
+        .from('group_members')
+        .insert({
+          group_id: groupId,
+          user_id: memberId,
+          role: 'member',
+          status: 'active',
+        })
+        .select()
+        .single();
+
+    this.handleError(
+      error,
+      'Unable to add member to group.',
+    );
+
+    return this.ensureFound(data);
 
   }
 
@@ -96,9 +134,7 @@ export class GroupsRepository extends BaseRepository {
    * ============================================================================
    */
   async findByCreator(
-
     userId: string,
-
   ) {
 
     const { data, error } =
@@ -119,9 +155,7 @@ export class GroupsRepository extends BaseRepository {
    * ============================================================================
    */
   async findById(
-
     id: string,
-
   ) {
 
     const { data, error } =
@@ -134,56 +168,20 @@ export class GroupsRepository extends BaseRepository {
     this.handleError(error);
 
     return this.ensureFound(
-
       data,
-
       'Group not found.',
-
     );
 
   }
 
   /**
    * ============================================================================
-   * Find Profile By Email
-   * ============================================================================
-   */
-  async findProfileByEmail(
-
-    email: string,
-
-  ) {
-
-    const { data, error } =
-      await this.db
-        .from('profiles')
-        .select('id,email')
-        .eq('email', email)
-        .single();
-
-    this.handleError(
-
-      error,
-
-      'User not found.',
-
-    );
-
-    return data;
-
-  }
-
-  /**
-   * ============================================================================
-   * Check If User Is Already A Member
+   * Check Member Exists
    * ============================================================================
    */
   async memberExists(
-
     groupId: string,
-
     userId: string,
-
   ) {
 
     const { data, error } =
@@ -202,57 +200,11 @@ export class GroupsRepository extends BaseRepository {
 
   /**
    * ============================================================================
-   * Invite Member
-   * ============================================================================
-   */
-  async inviteMember(
-
-    groupId: string,
-
-    userId: string,
-
-  ) {
-
-    const { data, error } =
-      await this.db
-        .from('group_members')
-        .insert({
-
-          group_id: groupId,
-
-          user_id: userId,
-
-          role: 'member',
-
-        })
-        .select()
-        .single();
-
-    this.handleError(
-
-      error,
-
-      'Unable to invite member.',
-
-    );
-
-    return this.ensureFound(
-
-      data,
-
-    );
-
-  }
-
-  /**
-   * ============================================================================
-   * Get Members Of A Group
+   * Get Group Members
    * ============================================================================
    */
   async getMembers(
-
     groupId: string,
-
   ) {
 
     const { data, error } =
@@ -266,8 +218,10 @@ export class GroupsRepository extends BaseRepository {
           profiles (
             id,
             full_name,
-            email,
-            avatar_url
+            national_id,
+            phone,
+            avatar_url,
+            account_status
           )
         `)
         .eq('group_id', groupId);

@@ -1,133 +1,39 @@
 /**
  * ============================================================================
- * Dashboard Statistics
+ * Member Dashboard DTO
  * ============================================================================
  */
 
-export interface DashboardStats {
+export interface MemberDashboardDto {
 
-  totalContributions: number;
+  totalContributed: number;
 
-  monthlyContributions: number;
+  totalTransactions: number;
 
-  pendingContributions: number;
+  upcomingMeeting: string | null;
 
-  totalMeetings: number;
-
-  upcomingMeetings: number;
-
-  totalNotifications: number;
+  notifications: number;
 
 }
 
 /**
  * ============================================================================
- * Treasurer Statistics
+ * Treasurer Dashboard DTO
  * ============================================================================
  */
 
-export interface TreasurerStats extends DashboardStats {
+export interface TreasurerDashboardDto {
 
   totalMembers: number;
 
-  activeMembers: number;
-
   totalCollected: number;
 
-  pendingApprovals: number;
+  totalTransactions: number;
 
-}
+  monthlyCollection: number;
 
-/**
- * ============================================================================
- * Recent Contribution
- * ============================================================================
- */
+  pendingVerifications: number;
 
-export interface RecentContribution {
-
-  id: string;
-
-  amount: number;
-
-  paymentDate: string;
-
-  status: string;
-
-  contributionType: string;
-
-}
-
-/**
- * ============================================================================
- * Upcoming Meeting
- * ============================================================================
- */
-
-export interface UpcomingMeeting {
-
-  id: string;
-
-  title: string;
-
-  meetingDate: string;
-
-  location?: string | null;
-
-}
-
-/**
- * ============================================================================
- * Dashboard Notification
- * ============================================================================
- */
-
-export interface DashboardNotification {
-
-  id: string;
-
-  title: string;
-
-  message: string;
-
-  isRead: boolean;
-
-  createdAt: string;
-
-}
-
-/**
- * ============================================================================
- * Member Dashboard Response
- * ============================================================================
- */
-
-export interface MemberDashboard {
-
-  stats: DashboardStats;
-
-  upcomingMeeting: UpcomingMeeting | null;
-
-  recentContributions: RecentContribution[];
-
-  notifications: DashboardNotification[];
-
-}
-
-/**
- * ============================================================================
- * Treasurer Dashboard Response
- * ============================================================================
- */
-
-export interface TreasurerDashboard {
-
-  stats: TreasurerStats;
-
-  upcomingMeeting: UpcomingMeeting | null;
-
-  recentContributions: RecentContribution[];
-
-  notifications: DashboardNotification[];
+  upcomingMeeting: string | null;
 
 }

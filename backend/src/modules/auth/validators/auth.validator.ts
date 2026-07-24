@@ -1,61 +1,74 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const createProfileSchema = z.object({
-  id: z.string().uuid(),
+/**
+ * ============================================================================
+ * Activate
+ * ============================================================================
+ */
+export const activateSchema = z.object({
 
-  email: z.string().email(),
+  nationalId:
 
-  fullName: z.string().min(2),
+    z.string()
 
-  avatarUrl: z.string().nullable().optional(),
+      .min(6)
+
+      .max(20),
+
+  activationCode:
+
+    z.string()
+
+      .length(6),
+
+  password:
+
+    z.string()
+
+      .min(6),
+
 });
 
-export type CreateProfileInput = z.infer<
-  typeof createProfileSchema
->;
+/**
+ * ============================================================================
+ * Login
+ * ============================================================================
+ */
+export const loginSchema = z.object({
 
-export const LoginSchema =
-    z.object({
+  nationalId:
 
-        nationalId:
+    z.string()
 
-            z.string()
+      .min(6)
 
-                .min(6)
+      .max(20),
 
-                .max(20),
+  password:
 
-        password:
+    z.string()
 
-            z.string()
+      .min(6),
 
-                .min(4),
+});
 
-    });
+/**
+ * ============================================================================
+ * Change Password
+ * ============================================================================
+ */
+export const changePasswordSchema = z.object({
 
-export const ActivateSchema =
-    z.object({
+  currentPassword:
 
-        nationalId:
+    z.string()
 
-            z.string()
+      .min(6),
 
-                .min(6)
+  newPassword:
 
-                .max(20),
+    z.string()
 
-        activationCode:
+      .min(6),
 
-            z.string()
-
-                .length(6),
-
-        password:
-
-            z.string()
-
-                .min(4)
-
-                .max(100),
-
-    });
+});

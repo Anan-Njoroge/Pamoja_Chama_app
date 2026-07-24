@@ -1,34 +1,44 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { DashboardController } from '../controllers/dashboard.controller';
+import { authMiddleware } from "@/middleware/auth.middleware";
 
-import { authMiddleware } from '@/middleware/auth.middleware';
-
-import { treasurerMiddleware } from '@/middleware/treasurer.middleware';
+import {
+  getMemberDashboard,
+  getTreasurerDashboard,
+} from "../controllers/dashboard.controller";
 
 const router = Router();
 
-const controller =
-  new DashboardController();
-
-router.use(authMiddleware);
+/**
+ * ============================================================================
+ * Member Dashboard
+ * ============================================================================
+ */
 
 router.get(
 
-  '/member',
+  "/member/:groupId",
 
-  controller.getMemberDashboard,
+  authMiddleware,
+
+  getMemberDashboard,
 
 );
 
+/**
+ * ============================================================================
+ * Treasurer Dashboard
+ * ============================================================================
+ */
+
 router.get(
 
-    '/treasurer',
-  
-    treasurerMiddleware,
-  
-    controller.getTreasurerDashboard,
-  
-  );
+  "/treasurer/:groupId",
+
+  authMiddleware,
+
+  getTreasurerDashboard,
+
+);
 
 export default router;

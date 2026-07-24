@@ -1,14 +1,11 @@
-import { AppError } from '@/shared/errors/AppError';
+import { AppError } from "@/shared/errors/AppError";
 
-import { ContributionsRepository } from '../repositories/contributions.repository';
-
-import { toContributionDto } from '../mappers/contributions.mapper';
+import { toContributionDto } from "../mappers/contributions.mapper";
+import { ContributionsRepository } from "../repositories/contributions.repository";
 
 import {
   CreateContributionDto,
-} from '../types/contributions.types';
-
-import { NotificationsService } from '@/modules/notifications/services/notifications.service';
+} from "../types/contributions.types";
 
 export class ContributionsService {
 
@@ -17,9 +14,6 @@ export class ContributionsService {
     private readonly repository =
       new ContributionsRepository(),
 
-    private readonly notifications =
-      new NotificationsService(),
-
   ) {}
 
   /**
@@ -27,31 +21,37 @@ export class ContributionsService {
    * Record Contribution
    * ============================================================================
    */
-  async createContribution(
+  async recordContribution(
 
-    currentUserId: string,
+    recordedBy: string,
 
     dto: CreateContributionDto,
 
   ) {
 
     /**
-     * Prevent duplicate receipt numbers
+     * ------------------------------------------------------------
+     * Prevent duplicate receipt numbers.
+     * ------------------------------------------------------------
      */
+
     if (dto.receiptNumber) {
 
       const exists =
+
         await this.repository.receiptExists(
+
           dto.receiptNumber,
+
         );
 
       if (exists) {
 
         throw new AppError(
 
-          'Receipt number already exists.',
+          "Receipt number already exists.",
 
-          400,
+          409,
 
         );
 
@@ -60,115 +60,110 @@ export class ContributionsService {
     }
 
     /**
-     * Determine user's role
+     * ------------------------------------------------------------
+     * Record contribution.
+     * ------------------------------------------------------------
      */
-    const membership =
-      await this.repository.getMemberRole(
 
-        dto.groupId,
-
-        currentUserId,
-
-      );
-
-    const autoApprove =
-
-      membership.role === 'group_admin';
-
-    /**
-     * Record contribution
-     */
     const contribution =
-      await this.repository.createContribution(
 
-        currentUserId,
+      await this.repository.recordContribution(
 
-        currentUserId,
+        recordedBy,
 
         dto,
 
-        autoApprove
-          ? 'approved'
-          : 'pending',
-
-        autoApprove
-          ? currentUserId
-          : undefined,
-
       );
 
     /**
-     * Notifications
+     * ------------------------------------------------------------
+     * Update member balances.
+     * ------------------------------------------------------------
      */
-    if (autoApprove) {
 
-      await this.notifications.createNotification(
+    await this.repository.updateMemberBalance(
 
-        currentUserId,
+      dto.groupId,
 
-        dto.groupId,
+      dto.memberId,
 
-        'contribution_approved',
+      dto.amount,
 
-        'Contribution Recorded',
+    );
 
-        'The contribution has been recorded successfully.',
+    /**
+     * ------------------------------------------------------------
+     * Update monthly totals.
+     * ------------------------------------------------------------
+     */
 
-      );
+    await this.repository.updateMonthlyContribution(
 
-    } else {
+      dto.groupId,
 
-      await this.notifications.createNotification(
+      contribution.payment_date,
 
-        currentUserId,
+      dto.amount,
 
-        dto.groupId,
+    );
 
-        'contribution_recorded',
+    /**
+     * ------------------------------------------------------------
+     * Update financial summary.
+     * ------------------------------------------------------------
+     */
 
-        'Contribution Submitted',
+    await this.repository.updateFinancialSummary(
 
-        'Your contribution has been submitted for approval.',
+      dto.groupId,
 
-      );
+      contribution.payment_date,
 
-    }
+      dto.amount,
+
+    );
 
     return toContributionDto(
+
       contribution,
+
     );
 
   }
 
   /**
    * ============================================================================
-   * My Contributions
+   * Get Contribution
    * ============================================================================
    */
-  async getMyContributions(
+  async getContribution(
 
-    memberId: string,
+    contributionId: string,
 
   ) {
 
-    const contributions =
+    const contribution =
 
-      await this.repository.findByMember(
-        memberId,
+      await this.repository.findById(
+
+        contributionId,
+
       );
 
-    return contributions.map(
-      toContributionDto,
+    return toContributionDto(
+
+      contribution,
+
     );
 
   }
 
   /**
    * ============================================================================
-   * Pending Contributions
+   * List Group Contributions
    * ============================================================================
    */
-  async getPendingContributions(
+  async getGroupContributions(
 
     groupId: string,
 
@@ -176,22 +171,25 @@ export class ContributionsService {
 
     const contributions =
 
-      await this.repository.findPending(
+      await this.repository.findGroupContributions(
+
         groupId,
+
       );
 
     return contributions.map(
+
       toContributionDto,
+
     );
 
   }
-
   /**
    * ============================================================================
-   * Approve Contribution
+   * Verify Contribution
    * ============================================================================
    */
-  async approveContribution(
+  async verifyContribution(
 
     contributionId: string,
 
@@ -202,56 +200,39 @@ export class ContributionsService {
     const contribution =
 
       await this.repository.findById(
+
         contributionId,
+
       );
 
-    if (
-
-      contribution.status !==
-      'pending'
-
-    ) {
+    if (!contribution) {
 
       throw new AppError(
 
-        'Only pending contributions can be approved.',
+        "Contribution not found.",
 
-        400,
+        404,
 
       );
 
     }
 
-    const updated =
+    await this.repository.verifyContribution(
 
-      await this.repository.approveContribution(
+      contributionId,
 
-        contributionId,
-
-        verifierId,
-
-      );
-
-    /**
-     * Notify contributor
-     */
-    await this.notifications.createNotification(
-
-      updated.member_id,
-
-      updated.group_id,
-
-      'contribution_approved',
-
-      'Contribution Approved',
-
-      'Your contribution has been approved.',
+      verifierId,
 
     );
 
-    return toContributionDto(
-      updated,
-    );
+    return {
+
+      success: true,
+
+      message:
+        "Contribution verified successfully.",
+
+    };
 
   }
 
@@ -273,57 +254,130 @@ export class ContributionsService {
     const contribution =
 
       await this.repository.findById(
+
         contributionId,
+
       );
 
-    if (
-
-      contribution.status !==
-      'pending'
-
-    ) {
+    if (!contribution) {
 
       throw new AppError(
 
-        'Only pending contributions can be rejected.',
+        "Contribution not found.",
 
-        400,
+        404,
 
       );
 
     }
 
-    const updated =
+    await this.repository.rejectContribution(
 
-      await this.repository.rejectContribution(
+      contributionId,
 
-        contributionId,
+      verifierId,
 
-        verifierId,
-
-        reason,
-
-      );
-
-    /**
-     * Notify contributor
-     */
-    await this.notifications.createNotification(
-
-      updated.member_id,
-
-      updated.group_id,
-
-      'contribution_rejected',
-
-      'Contribution Rejected',
-
-      `Reason: ${reason}`,
+      reason,
 
     );
 
-    return toContributionDto(
-      updated,
+    return {
+
+      success: true,
+
+      message:
+        "Contribution rejected successfully.",
+
+    };
+
+  }
+
+  /**
+   * ============================================================================
+   * Delete Contribution
+   * ============================================================================
+   */
+  async deleteContribution(
+
+    contributionId: string,
+
+  ) {
+
+    const contribution =
+
+      await this.repository.findById(
+
+        contributionId,
+
+      );
+
+    if (!contribution) {
+
+      throw new AppError(
+
+        "Contribution not found.",
+
+        404,
+
+      );
+
+    }
+
+    await this.repository.softDeleteContribution(
+
+      contributionId,
+
+    );
+
+    return {
+
+      success: true,
+
+      message:
+        "Contribution deleted successfully.",
+
+    };
+
+  }
+
+  /**
+   * ============================================================================
+   * Member Balance
+   * ============================================================================
+   */
+  async getMemberBalance(
+
+    groupId: string,
+
+    memberId: string,
+
+  ) {
+
+    return await this.repository.getMemberBalance(
+
+      groupId,
+
+      memberId,
+
+    );
+
+  }
+
+  /**
+   * ============================================================================
+   * Financial Summary
+   * ============================================================================
+   */
+  async getFinancialSummary(
+
+    groupId: string,
+
+  ) {
+
+    return await this.repository.getFinancialSummary(
+
+      groupId,
+
     );
 
   }

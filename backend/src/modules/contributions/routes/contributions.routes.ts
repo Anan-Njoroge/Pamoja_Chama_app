@@ -1,68 +1,127 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { authMiddleware } from '@/middleware/auth.middleware';
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 import {
-
-  createContribution,
-
-  getMyContributions,
-
-  getPendingContributions,
-
-  approveContribution,
-
+  recordContribution,
+  getContribution,
+  getGroupContributions,
+  verifyContribution,
   rejectContribution,
-
-} from '../controllers/contributions.controller';
+  deleteContribution,
+  getMemberBalance,
+  getFinancialSummary,
+} from "../controllers/contributions.controller";
 
 const router = Router();
 
-router.use(authMiddleware);
-
 /**
  * ============================================================================
- * Contributions
+ * Record Contribution
  * ============================================================================
  */
 
 router.post(
 
-  '/',
+  "/",
 
-  createContribution,
+  authMiddleware,
+
+  recordContribution,
+
+);
+
+/**
+ * ============================================================================
+ * Contribution Queries
+ * ============================================================================
+ */
+
+router.get(
+
+  "/:id",
+
+  authMiddleware,
+
+  getContribution,
 
 );
 
 router.get(
 
-  '/',
+  "/group/:groupId",
 
-  getMyContributions,
+  authMiddleware,
+
+  getGroupContributions,
 
 );
 
-router.get(
+/**
+ * ============================================================================
+ * Verification
+ * ============================================================================
+ */
 
-  '/pending',
+router.patch(
 
-  getPendingContributions,
+  "/:id/verify",
+
+  authMiddleware,
+
+  verifyContribution,
 
 );
 
 router.patch(
 
-  '/:id/approve',
+  "/:id/reject",
 
-  approveContribution,
-
-);
-
-router.patch(
-
-  '/:id/reject',
+  authMiddleware,
 
   rejectContribution,
+
+);
+
+/**
+ * ============================================================================
+ * Delete
+ * ============================================================================
+ */
+
+router.delete(
+
+  "/:id",
+
+  authMiddleware,
+
+  deleteContribution,
+
+);
+
+/**
+ * ============================================================================
+ * Reports
+ * ============================================================================
+ */
+
+router.get(
+
+  "/group/:groupId/member/:memberId/balance",
+
+  authMiddleware,
+
+  getMemberBalance,
+
+);
+
+router.get(
+
+  "/group/:groupId/summary",
+
+  authMiddleware,
+
+  getFinancialSummary,
 
 );
 

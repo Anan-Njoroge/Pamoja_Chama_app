@@ -1,52 +1,67 @@
-export interface CreateProfileDto {
-    id: string;
-    email: string;
-    fullName: string;
-    avatarUrl?: string | null;
-  }
-  
-  export interface ProfileResponse {
-    id: string;
-    email: string;
-    full_name: string;
-    avatar_url: string | null;
-    default_role: 'member' | 'treasurer' | 'admin';
-  }
+/**
+ * ============================================================================
+ * Login
+ * ============================================================================
+ */
+export interface LoginDto {
 
-  export interface LoginDto {
+  nationalId: string;
 
-    nationalId: string;
-
-    password: string;
+  password: string;
 
 }
 
+/**
+ * ============================================================================
+ * Activate Account
+ * ============================================================================
+ */
 export interface ActivateAccountDto {
 
-    nationalId: string;
+  nationalId: string;
 
-    activationCode: string;
+  activationCode: string;
 
-    password: string;
+  password: string;
 
 }
 
-export interface AuthUser {
+/**
+ * ============================================================================
+ * Change Password
+ * ============================================================================
+ */
+export interface ChangePasswordDto {
+
+  currentPassword: string;
+
+  newPassword: string;
+
+}
+
+/**
+ * ============================================================================
+ * Auth Response
+ * ============================================================================
+ */
+export interface AuthResponseDto {
+
+  accessToken: string;
+
+  refreshToken: string;
+
+  profile: {
 
     id: string;
 
     fullName: string;
 
     nationalId: string;
+
+    phone: string;
 
     accountStatus: string;
 
-}
-
-export interface LoginResponse {
-
-    accessToken: string;
-
-    user: AuthUser;
+  };
 
 }

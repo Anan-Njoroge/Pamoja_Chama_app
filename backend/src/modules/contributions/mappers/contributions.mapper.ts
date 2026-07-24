@@ -1,57 +1,100 @@
-import { ContributionResponseDto } from '../types/contributions.types';
+import { ContributionDto } from "../types/contributions.types";
 
-export const toContributionDto = (
+/**
+ * ============================================================================
+ * Database Row
+ * ============================================================================
+ */
 
-  contribution: any,
+interface ContributionRow {
 
-): ContributionResponseDto => ({
+  id: string;
 
-  id: contribution.id,
+  group_id: string;
 
-  groupId: contribution.group_id,
+  member_id: string;
 
-  memberId: contribution.member_id,
+  contribution_type_id: string;
 
-  contributionTypeId:
+  payment_method_id: string;
 
-    contribution.contribution_type_id,
+  amount: number;
 
-  paymentMethodId:
+  payment_date: string;
 
-    contribution.payment_method_id,
+  receipt_number: string | null;
 
-  recordedBy:
+  notes: string | null;
 
-    contribution.recorded_by,
+  recorded_by: string;
 
-  verifiedBy:
+  created_at: string;
 
-    contribution.verified_by,
+}
 
-  receiptNumber:
+/**
+ * ============================================================================
+ * Database → DTO
+ * ============================================================================
+ */
 
-    contribution.receipt_number,
+export function toContributionDto(
 
-  amount: Number(contribution.amount),
+  contribution: ContributionRow,
 
-  paymentDate:
+): ContributionDto {
 
-    contribution.payment_date,
+  return {
 
-  status:
+    id: contribution.id,
 
-    contribution.status,
+    groupId: contribution.group_id,
 
-  notes:
+    memberId: contribution.member_id,
 
-    contribution.notes,
+    contributionTypeId:
+      contribution.contribution_type_id,
 
-  rejectionReason:
+    paymentMethodId:
+      contribution.payment_method_id,
 
-    contribution.rejection_reason,
+    amount: contribution.amount,
 
-  createdAt:
+    paymentDate:
+      contribution.payment_date,
 
-    contribution.created_at,
+    receiptNumber:
+      contribution.receipt_number,
 
-});
+    notes:
+      contribution.notes,
+
+    recordedBy:
+      contribution.recorded_by,
+
+    createdAt:
+      contribution.created_at,
+
+  };
+
+}
+
+/**
+ * ============================================================================
+ * Database[] → DTO[]
+ * ============================================================================
+ */
+
+export function toContributionDtos(
+
+  rows: ContributionRow[],
+
+): ContributionDto[] {
+
+  return rows.map(
+
+    toContributionDto,
+
+  );
+
+}

@@ -1,33 +1,101 @@
-import { z } from 'zod';
+import { z } from "zod";
+
+/**
+ * ============================================================================
+ * Record Contribution
+ * ============================================================================
+ */
 
 export const createContributionSchema = z.object({
 
-  groupId: z.string().uuid(),
+  groupId: z
+    .string()
+    .uuid("Invalid group id."),
 
-  contributionTypeId: z.string().uuid(),
+  memberId: z
+    .string()
+    .uuid("Invalid member id."),
 
-  paymentMethodId: z.string().uuid().optional(),
+  contributionTypeId: z
+    .string()
+    .uuid("Invalid contribution type."),
 
-  receiptNumber: z.string().trim().optional(),
+  paymentMethodId: z
+    .string()
+    .uuid("Invalid payment method."),
 
-  amount: z.number().positive(),
+    amount: z
+    .coerce
+    .number()
+    .positive("Amount must be greater than zero"),
 
-  paymentDate: z.string().datetime().optional(),
+  paymentDate: z
+    .string()
+    .datetime()
+    .optional(),
 
-  notes: z.string().max(500).optional(),
+  receiptNumber: z
+    .string()
+    .max(100)
+    .optional(),
+
+  notes: z
+    .string()
+    .max(500)
+    .optional(),
 
 });
 
-export const rejectContributionSchema = z.object({
+/**
+ * ============================================================================
+ * Update Contribution
+ * ============================================================================
+ */
 
-  rejectionReason: z
+export const updateContributionSchema = z.object({
 
+  contributionTypeId: z
     .string()
+    .uuid()
+    .optional(),
 
-    .trim()
+  paymentMethodId: z
+    .string()
+    .uuid()
+    .optional(),
 
-    .min(5)
+  amount: z
+    .number()
+    .positive()
+    .optional(),
 
-    .max(300),
+  paymentDate: z
+    .string()
+    .datetime()
+    .optional(),
+
+  receiptNumber: z
+    .string()
+    .max(100)
+    .optional(),
+
+  notes: z
+    .string()
+    .max(500)
+    .optional(),
+
+});
+
+/**
+ * ============================================================================
+ * Route Params
+ * ============================================================================
+ */
+
+export const contributionIdSchema = z.object({
+
+  id: z
+    .string()
+    .uuid(),
 
 });

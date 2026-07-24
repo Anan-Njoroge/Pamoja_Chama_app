@@ -1,9 +1,9 @@
-import { DashboardRepository } from '../repositories/dashboard.repository';
+import { DashboardRepository } from "../repositories/dashboard.repository";
 
 import {
-  MemberDashboard,
-  TreasurerDashboard,
-} from '../types/dashboard.types';
+  toMemberDashboardDto,
+  toTreasurerDashboardDto,
+} from "../mappers/dashboard.mapper";
 
 export class DashboardService {
 
@@ -21,97 +21,61 @@ export class DashboardService {
    */
   async getMemberDashboard(
 
-    memberId: string,
-
     groupId: string,
 
-  ): Promise<MemberDashboard> {
+    memberId: string,
+
+  ) {
 
     const [
 
-      stats,
+      balance,
 
       meeting,
-
-      contributions,
 
       notifications,
 
     ] = await Promise.all([
 
-      this.repository.getMemberStats(
+      this.repository.getMemberBalance(
+
+        groupId,
+
         memberId,
+
       ),
 
       this.repository.getUpcomingMeeting(
+
         groupId,
+
       ),
 
-      this.repository.getRecentContributions(
-        memberId,
-      ),
+      this.repository.getUnreadNotifications(
 
-      this.repository.getNotifications(
         memberId,
+
       ),
 
     ]);
 
-    return {
+    return toMemberDashboardDto({
 
-      stats,
+      total_contributed:
 
-      upcomingMeeting: meeting
-        ? {
+        balance?.total_contributed ?? 0,
 
-            id: meeting.id,
+      total_transactions:
 
-            title: meeting.title,
+        balance?.total_transactions ?? 0,
 
-            meetingDate:
-              meeting.meeting_date,
+      upcomingMeeting:
 
-            location:
-              meeting.location,
+        meeting?.meeting_date ?? null,
 
-          }
-        : null,
+      notifications,
 
-      recentContributions:
-        contributions.map((c: any) => ({
-
-          id: c.id,
-
-          amount: Number(c.amount),
-
-          paymentDate:
-            c.payment_date,
-
-          status: c.status,
-
-          contributionType:
-            c.contribution_types?.name ??
-            '',
-
-        })),
-
-      notifications:
-        notifications.map((n: any) => ({
-
-          id: n.id,
-
-          title: n.title,
-
-          message: n.message,
-
-          isRead: n.is_read,
-
-          createdAt:
-            n.created_at,
-
-        })),
-
-    };
+    });
 
   }
 
@@ -122,97 +86,83 @@ export class DashboardService {
    */
   async getTreasurerDashboard(
 
-    memberId: string,
-
     groupId: string,
 
-  ): Promise<TreasurerDashboard> {
+  ) {
 
     const [
 
-      stats,
+      summary,
+
+      members,
+
+      pending,
 
       meeting,
 
-      contributions,
-
-      notifications,
+      monthly,
 
     ] = await Promise.all([
 
-      this.repository.getTreasurerStats(
+      this.repository.getFinancialSummary(
+
         groupId,
+
+      ),
+
+      this.repository.getTotalMembers(
+
+        groupId,
+
+      ),
+
+      this.repository.getPendingVerifications(
+
+        groupId,
+
       ),
 
       this.repository.getUpcomingMeeting(
+
         groupId,
+
       ),
 
-      this.repository.getRecentContributions(
-        memberId,
-      ),
+      this.repository.getMonthlyCollection(
 
-      this.repository.getNotifications(
-        memberId,
+        groupId,
+
       ),
 
     ]);
 
-    return {
+    return toTreasurerDashboardDto({
 
-      stats,
+      totalMembers:
 
-      upcomingMeeting: meeting
-        ? {
+        members,
 
-            id: meeting.id,
+      totalCollected:
 
-            title: meeting.title,
+        summary?.total_collected ?? 0,
 
-            meetingDate:
-              meeting.meeting_date,
+      totalTransactions:
 
-            location:
-              meeting.location,
+        summary?.total_transactions ?? 0,
 
-          }
-        : null,
+      monthlyCollection:
 
-      recentContributions:
-        contributions.map((c: any) => ({
+        monthly?.total ?? 0,
 
-          id: c.id,
+      pendingVerifications:
 
-          amount: Number(c.amount),
+        pending,
 
-          paymentDate:
-            c.payment_date,
+      upcomingMeeting:
 
-          status: c.status,
+        meeting?.meeting_date ?? null,
 
-          contributionType:
-            c.contribution_types?.name ??
-            '',
-
-        })),
-
-      notifications:
-        notifications.map((n: any) => ({
-
-          id: n.id,
-
-          title: n.title,
-
-          message: n.message,
-
-          isRead: n.is_read,
-
-          createdAt:
-            n.created_at,
-
-        })),
-
-    };
+    });
 
   }
 

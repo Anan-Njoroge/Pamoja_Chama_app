@@ -1,287 +1,421 @@
+import { Request, Response } from "express";
+
+import { AppError } from "@/shared/errors/AppError";
+import { asyncHandler } from "@/shared/utils/asyncHandler";
 import {
-    Request,
-    Response,
-  } from 'express';
-  
-  import { AppError } from '@/shared/errors/AppError';
-  import { asyncHandler } from '@/shared/utils/asyncHandler';
-  
-  import { ContributionsService } from '../services/contributions.service';
-  
-  import {
-    createContributionSchema,
-    rejectContributionSchema,
-  } from '../validators/contributions.validator';
-  
-  const contributionsService =
-    new ContributionsService();
-  
-  /**
-   * ============================================================================
-   * Record Contribution
-   * ============================================================================
-   */
-  export const createContribution = asyncHandler(
-  
+  success,
+  created,
+} from "@/shared/utils/apiResponse";
+
+import { ContributionsService } from "../services/contributions.service";
+
+const contributionsService =
+  new ContributionsService();
+
+/**
+ * ============================================================================
+ * Helper
+ * ============================================================================
+ */
+
+const getRouteParam = (
+
+  value: string | string[] | undefined,
+
+): string => {
+
+  if (!value) {
+
+    throw new AppError(
+
+      "Missing route parameter.",
+
+      400,
+
+    );
+
+  }
+
+  return Array.isArray(value)
+
+    ? value[0]
+
+    : value;
+
+};
+
+/**
+ * ============================================================================
+ * Record Contribution
+ * ============================================================================
+ */
+
+export const recordContribution =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-          'Unauthorized.',
+
+          "Unauthorized.",
+
           401,
+
         );
-  
+
       }
-  
-      const dto =
-        createContributionSchema.parse(
+
+      const contribution =
+
+        await contributionsService.recordContribution(
+
+          req.user.id,
+
           req.body,
+
         );
-  
-      /**
-       * NOTE:
-       * The user's group role (member/group_admin)
-       * will be determined in the service layer
-       * from the group_members table.
-       */
-      const contribution =
-        await contributionsService.createContribution(
-  
-          user.id,
-  
-          dto,
-  
-        );
-  
-      return res.status(201).json({
-  
-        success: true,
-  
-        message:
-          'Contribution recorded successfully.',
-  
-        data: contribution,
-  
-      });
-  
+
+      return created(
+
+        res,
+
+        contribution,
+
+        "Contribution recorded successfully.",
+
+      );
+
     },
-  
+
   );
-  
-  /**
-   * ============================================================================
-   * My Contributions
-   * ============================================================================
-   */
-  export const getMyContributions = asyncHandler(
-  
+
+/**
+ * ============================================================================
+ * Get Contribution
+ * ============================================================================
+ */
+
+export const getContribution =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
-        throw new AppError(
-          'Unauthorized.',
-          401,
+
+      const contribution =
+
+        await contributionsService.getContribution(
+
+          getRouteParam(
+
+            req.params.id,
+
+          ),
+
         );
-  
-      }
-  
+
+      return success(
+
+        res,
+
+        contribution,
+
+      );
+
+    },
+
+  );
+
+/**
+ * ============================================================================
+ * Group Contributions
+ * ============================================================================
+ */
+
+export const getGroupContributions =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
       const contributions =
-        await contributionsService.getMyContributions(
-          user.id,
+
+        await contributionsService.getGroupContributions(
+
+          getRouteParam(
+
+            req.params.groupId,
+
+          ),
+
         );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        data: contributions,
-  
-      });
-  
+
+      return success(
+
+        res,
+
+        contributions,
+
+      );
+
     },
-  
+
   );
-  
   /**
-   * ============================================================================
-   * Pending Contributions
-   * ============================================================================
-   */
-  export const getPendingContributions = asyncHandler(
-  
+ * ============================================================================
+ * Verify Contribution
+ * ============================================================================
+ */
+export const verifyContribution =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const rawGroupId =
-        req.query.groupId;
-  
-      const groupId =
-        typeof rawGroupId === 'string'
-          ? rawGroupId
-          : undefined;
-  
-      if (!groupId) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-          'groupId is required.',
-          400,
-        );
-  
-      }
-  
-      const contributions =
-        await contributionsService.getPendingContributions(
-          groupId,
-        );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        data: contributions,
-  
-      });
-  
-    },
-  
-  );
-  
-  /**
-   * ============================================================================
-   * Approve Contribution
-   * ============================================================================
-   */
-  export const approveContribution = asyncHandler(
-  
-    async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
-        throw new AppError(
-          'Unauthorized.',
+
+          "Unauthorized.",
+
           401,
+
         );
-  
+
       }
-  
-      const contributionId =
-        Array.isArray(req.params.id)
-          ? req.params.id[0]
-          : req.params.id;
-  
-      const contribution =
-        await contributionsService.approveContribution(
-  
-          contributionId,
-  
-          user.id,
-  
+
+      const result =
+
+        await contributionsService.verifyContribution(
+
+          getRouteParam(
+
+            req.params.id,
+
+          ),
+
+          req.user.id,
+
         );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        message:
-          'Contribution approved.',
-  
-        data: contribution,
-  
-      });
-  
+
+      return success(
+
+        res,
+
+        result,
+
+        result.message,
+
+      );
+
     },
-  
+
   );
-  
-  /**
-   * ============================================================================
-   * Reject Contribution
-   * ============================================================================
-   */
-  export const rejectContribution = asyncHandler(
-  
+
+/**
+ * ============================================================================
+ * Reject Contribution
+ * ============================================================================
+ */
+export const rejectContribution =
+  asyncHandler(
+
     async (
-  
+
       req: Request,
-  
+
       res: Response,
-  
+
     ) => {
-  
-      const user = req.user;
-  
-      if (!user) {
-  
+
+      if (!req.user) {
+
         throw new AppError(
-          'Unauthorized.',
+
+          "Unauthorized.",
+
           401,
+
         );
-  
+
       }
-  
-      const dto =
-        rejectContributionSchema.parse(
-          req.body,
-        );
-  
-      const contributionId =
-        Array.isArray(req.params.id)
-          ? req.params.id[0]
-          : req.params.id;
-  
-      const contribution =
+
+      const result =
+
         await contributionsService.rejectContribution(
-  
-          contributionId,
-  
-          user.id,
-  
-          dto.rejectionReason,
-  
+
+          getRouteParam(
+
+            req.params.id,
+
+          ),
+
+          req.user.id,
+
+          req.body.reason,
+
         );
-  
-      return res.status(200).json({
-  
-        success: true,
-  
-        message:
-          'Contribution rejected.',
-  
-        data: contribution,
-  
-      });
-  
+
+      return success(
+
+        res,
+
+        result,
+
+        result.message,
+
+      );
+
     },
-  
+
+  );
+
+/**
+ * ============================================================================
+ * Delete Contribution
+ * ============================================================================
+ */
+export const deleteContribution =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const result =
+
+        await contributionsService.deleteContribution(
+
+          getRouteParam(
+
+            req.params.id,
+
+          ),
+
+        );
+
+      return success(
+
+        res,
+
+        result,
+
+        result.message,
+
+      );
+
+    },
+
+  );
+
+/**
+ * ============================================================================
+ * Member Balance
+ * ============================================================================
+ */
+export const getMemberBalance =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const result =
+
+        await contributionsService.getMemberBalance(
+
+          getRouteParam(
+
+            req.params.groupId,
+
+          ),
+
+          getRouteParam(
+
+            req.params.memberId,
+
+          ),
+
+        );
+
+      return success(
+
+        res,
+
+        result,
+
+      );
+
+    },
+
+  );
+
+/**
+ * ============================================================================
+ * Group Financial Summary
+ * ============================================================================
+ */
+export const getFinancialSummary =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const result =
+
+        await contributionsService.getFinancialSummary(
+
+          getRouteParam(
+
+            req.params.groupId,
+
+          ),
+
+        );
+
+      return success(
+
+        res,
+
+        result,
+
+      );
+
+    },
+
   );

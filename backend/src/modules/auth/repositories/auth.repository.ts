@@ -1,50 +1,98 @@
-import { supabase } from "@/config/database";
+import { BaseRepository } from "@/shared/database/BaseRepository";
 
-export class AuthRepository {
-  async findByNationalId(nationalId: string) {
-    const { data, error } = await supabase
+export class AuthRepository extends BaseRepository {
 
-      .from("profiles")
+  /**
+   * ============================================================================
+   * Find Profile By National ID
+   * ============================================================================
+   */
+  async findByNationalId(
+    nationalId: string,
+  ) {
 
-      .select("*")
+    const { data, error } =
+      await this.db
+        .from("profiles")
+        .select("*")
+        .eq("national_id", nationalId)
+        .maybeSingle();
 
-      .eq("national_id", nationalId)
-
-      .maybeSingle();
-
-    if (error) throw error;
+    this.handleError(error);
 
     return data;
+
   }
 
+  /**
+   * ============================================================================
+   * Find Profile By ID
+   * ============================================================================
+   */
+  async findById(
+    id: string,
+  ) {
+
+    const { data, error } =
+      await this.db
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    this.handleError(error);
+
+    return data;
+
+  }
+
+  /**
+   * ============================================================================
+   * Save Activation Code
+   * ============================================================================
+   */
   async saveActivationCode(
+
     profileId: string,
 
-    codeHash: string,
+    activationCodeHash: string,
 
     expiresAt: string,
+
   ) {
-    const { error } = await supabase
 
-      .from("profiles")
+    const { error } =
+      await this.db
 
-      .update({
-        activation_code_hash: codeHash,
+        .from("profiles")
 
-        activation_expires_at: expiresAt,
+        .update({
 
-        account_status: "pending",
-      })
+          activation_code_hash:
+            activationCodeHash,
 
-      .eq("id", profileId);
+          activation_expires_at:
+            expiresAt,
 
-    if (error) throw error;
+        })
+
+        .eq("id", profileId);
+
+    this.handleError(error);
+
   }
 
+  /**
+   * ============================================================================
+   * Complete Account Activation
+   * ============================================================================
+   */
   async updateActivation(
+
     profileId: string,
 
-    values: {
+    updates: {
+
       password_hash: string;
 
       activation_code_hash: null;
@@ -52,44 +100,168 @@ export class AuthRepository {
       activation_expires_at: null;
 
       account_status: "active";
+
     },
+
   ) {
-    const { data, error } = await supabase
 
-      .from("profiles")
+    const { data, error } =
+      await this.db
 
-      .update(values)
+        .from("profiles")
 
-      .eq("id", profileId)
+        .update(updates)
 
-      .select()
+        .eq("id", profileId)
 
-      .single();
+        .select()
 
-    if (error) throw error;
+        .single();
+
+    this.handleError(error);
 
     return data;
+
   }
 
+  /**
+   * ============================================================================
+   * Update Login Information
+   * ============================================================================
+   */
   async updateLogin(
+
     profileId: string,
 
     failedAttempts: number,
 
-    lastLogin: string,
+    lastLoginAt: string,
+
   ) {
-    const { error } = await supabase
 
-      .from("profiles")
+    const { error } =
+      await this.db
 
-      .update({
-        failed_attempts: failedAttempts,
+        .from("profiles")
 
-        last_login_at: lastLogin,
-      })
+        .update({
 
-      .eq("id", profileId);
+          failed_attempts:
+            failedAttempts,
 
-    if (error) throw error;
+          last_login_at:
+            lastLoginAt,
+
+        })
+
+        .eq("id", profileId);
+
+    this.handleError(error);
+
   }
+
+  /**
+   * ============================================================================
+   * Increment Failed Login Attempts
+   * ============================================================================
+   */
+  async incrementFailedAttempts(
+
+    profileId: string,
+
+    currentAttempts: number,
+
+  ) {
+
+    const { error } =
+      await this.db
+
+        .from("profiles")
+
+        .update({
+
+          failed_attempts:
+            currentAttempts + 1,
+
+        })
+
+        .eq("id", profileId);
+
+    this.handleError(error);
+
+  }
+
+  /**
+   * ============================================================================
+   * Save Password Reset Code
+   * ============================================================================
+   */
+  async saveResetCode(
+
+    profileId: string,
+
+    resetCodeHash: string,
+
+    expiresAt: string,
+
+  ) {
+
+    const { error } =
+      await this.db
+
+        .from("profiles")
+
+        .update({
+
+          reset_code_hash:
+            resetCodeHash,
+
+          reset_code_expires_at:
+            expiresAt,
+
+        })
+
+        .eq("id", profileId);
+
+    this.handleError(error);
+
+  }
+
+  /**
+   * ============================================================================
+   * Update Password
+   * ============================================================================
+   */
+  async updatePassword(
+
+    profileId: string,
+
+    passwordHash: string,
+
+  ) {
+
+    const { error } =
+      await this.db
+
+        .from("profiles")
+
+        .update({
+
+          password_hash:
+            passwordHash,
+
+          reset_code_hash:
+            null,
+
+          reset_code_expires_at:
+            null,
+
+        })
+
+        .eq("id", profileId);
+
+    this.handleError(error);
+
+  }
+
 }
