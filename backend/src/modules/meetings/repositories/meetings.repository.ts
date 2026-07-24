@@ -1,11 +1,10 @@
-import { BaseRepository } from '@/shared/database/BaseRepository';
+import { BaseRepository } from "@/shared/database/BaseRepository";
 
 import {
   AttendanceDto,
   CreateMeetingDto,
-  Meeting,
   UpdateMeetingDto,
-} from '../types/meetings.types';
+} from "../types/meetings.types";
 
 export class MeetingsRepository extends BaseRepository {
 
@@ -16,129 +15,45 @@ export class MeetingsRepository extends BaseRepository {
    */
   async createMeeting(
 
-    creatorId: string,
+    createdBy: string,
 
     dto: CreateMeetingDto,
 
   ) {
 
-    const {
-      data,
-      error,
-    }: {
-      data: Meeting | null;
-      error: any;
-    } = await this.db
-      .from('meetings')
-      .insert({
-
-        group_id: dto.groupId,
-
-        title: dto.title,
-
-        description: dto.description ?? null,
-
-        location: dto.location ?? null,
-
-        meeting_date: dto.meetingDate,
-
-        created_by: creatorId,
-
-      })
-      .select()
-      .single();
-
-    this.handleError(
-      error,
-      'Unable to create meeting.',
-    );
-
-    return this.ensureFound(data);
-
-  }
-
-  /**
-   * ============================================================================
-   * Get Meeting
-   * ============================================================================
-   */
-  async findById(
-    meetingId: string,
-  ) {
-
-    const {
-      data,
-      error,
-    }: {
-      data: Meeting | null;
-      error: any;
-    } = await this.db
-      .from('meetings')
-      .select('*')
-      .eq('id', meetingId)
-      .single();
-
-    this.handleError(error);
-
-    return this.ensureFound(
-      data,
-      'Meeting not found.',
-    );
-
-  }
-
-  /**
-   * ============================================================================
-   * Group Meetings
-   * ============================================================================
-   */
-  async findByGroup(
-    groupId: string,
-  ) {
-
     const { data, error } =
+
       await this.db
-        .from('meetings')
-        .select('*')
-        .eq('group_id', groupId)
-        .order(
-          'meeting_date',
-          { ascending: true },
-        );
+
+        .from("meetings")
+
+        .insert({
+
+          group_id: dto.groupId,
+
+          title: dto.title,
+
+          description:
+
+            dto.description ?? null,
+
+          location: dto.location,
+
+          meeting_date:
+
+            dto.meetingDate,
+
+          created_by: createdBy,
+
+        })
+
+        .select()
+
+        .single();
 
     this.handleError(error);
 
-    return data ?? [];
-
-  }
-
-  /**
-   * ============================================================================
-   * Upcoming Meetings
-   * ============================================================================
-   */
-  async findUpcoming(
-    groupId: string,
-  ) {
-
-    const { data, error } =
-      await this.db
-        .from('meetings')
-        .select('*')
-        .eq('group_id', groupId)
-        .eq('status', 'scheduled')
-        .gte(
-          'meeting_date',
-          new Date().toISOString(),
-        )
-        .order(
-          'meeting_date',
-          { ascending: true },
-        );
-
-    this.handleError(error);
-
-    return data ?? [];
+    return data;
 
   }
 
@@ -155,41 +70,134 @@ export class MeetingsRepository extends BaseRepository {
 
   ) {
 
-    const {
-      data,
-      error,
-    }: {
-      data: Meeting | null;
-      error: any;
-    } = await this.db
-      .from('meetings')
-      .update({
+    const { data, error } =
 
-        title: dto.title,
+      await this.db
 
-        description: dto.description,
+        .from("meetings")
 
-        location: dto.location,
+        .update({
 
-        meeting_date: dto.meetingDate,
+          title: dto.title,
 
-        status: dto.status,
+          description:
 
-        minutes: dto.minutes,
+            dto.description,
 
-        updated_at: new Date().toISOString(),
+          location: dto.location,
 
-      })
-      .eq('id', meetingId)
-      .select()
-      .single();
+          meeting_date:
 
-    this.handleError(
-      error,
-      'Unable to update meeting.',
-    );
+            dto.meetingDate,
 
-    return this.ensureFound(data);
+          minutes: dto.minutes,
+
+          status: dto.status,
+
+        })
+
+        .eq("id", meetingId)
+
+        .select()
+
+        .single();
+
+    this.handleError(error);
+
+    return data;
+
+  }
+
+  /**
+   * ============================================================================
+   * Find Meeting
+   * ============================================================================
+   */
+  async findById(
+
+    meetingId: string,
+
+  ) {
+
+    const { data, error } =
+
+      await this.db
+
+        .from("meetings")
+
+        .select("*")
+
+        .eq("id", meetingId)
+
+        .maybeSingle();
+
+    this.handleError(error);
+
+    return data;
+
+  }
+
+  /**
+   * ============================================================================
+   * Group Meetings
+   * ============================================================================
+   */
+  async findGroupMeetings(
+
+    groupId: string,
+
+  ) {
+
+    const { data, error } =
+
+      await this.db
+
+        .from("meetings")
+
+        .select("*")
+
+        .eq("group_id", groupId)
+
+        .order(
+
+          "meeting_date",
+
+          {
+
+            ascending: true,
+
+          },
+
+        );
+
+    this.handleError(error);
+
+    return data ?? [];
+
+  }
+
+  /**
+   * ============================================================================
+   * Delete Meeting
+   * ============================================================================
+   */
+  async deleteMeeting(
+
+    meetingId: string,
+
+  ) {
+
+    const { error } =
+
+      await this.db
+
+        .from("meetings")
+
+        .delete()
+
+        .eq("id", meetingId);
+
+    this.handleError(error);
 
   }
 
@@ -200,34 +208,41 @@ export class MeetingsRepository extends BaseRepository {
    */
   async recordAttendance(
 
-    meetingId: string,
-
     dto: AttendanceDto,
 
   ) {
 
     const { data, error } =
+
       await this.db
-        .from('meeting_attendance')
-        .upsert({
 
-          meeting_id: meetingId,
+        .from("meeting_attendance")
 
-          member_id: dto.memberId,
+        .insert({
 
-          status: dto.status,
+          meeting_id:
+
+            dto.meetingId,
+
+          member_id:
+
+            dto.memberId,
+
+          status:
+
+            dto.status,
 
           checked_in_at:
+
             new Date().toISOString(),
 
         })
+
         .select()
+
         .single();
 
-    this.handleError(
-      error,
-      'Unable to record attendance.',
-    );
+    this.handleError(error);
 
     return data;
 
@@ -235,32 +250,108 @@ export class MeetingsRepository extends BaseRepository {
 
   /**
    * ============================================================================
-   * Get Attendance
+   * Update Attendance
    * ============================================================================
    */
-  async getAttendance(
-    meetingId: string,
+  async updateAttendance(
+
+    dto: AttendanceDto,
+
   ) {
 
     const { data, error } =
+
       await this.db
-        .from('meeting_attendance')
-        .select(`
-          *,
-          profiles(
-            id,
-            full_name,
-            email
-          )
-        `)
-        .eq(
-          'meeting_id',
-          meetingId,
-        );
+
+        .from("meeting_attendance")
+
+        .update({
+
+          status:
+
+            dto.status,
+
+          checked_in_at:
+
+            new Date().toISOString(),
+
+        })
+
+        .eq("meeting_id", dto.meetingId)
+
+        .eq("member_id", dto.memberId)
+
+        .select()
+
+        .single();
+
+    this.handleError(error);
+
+    return data;
+
+  }
+
+  /**
+   * ============================================================================
+   * Attendance List
+   * ============================================================================
+   */
+  async getAttendance(
+
+    meetingId: string,
+
+  ) {
+
+    const { data, error } =
+
+      await this.db
+
+        .from("meeting_attendance")
+
+        .select("*")
+
+        .eq("meeting_id", meetingId);
 
     this.handleError(error);
 
     return data ?? [];
+
+  }
+
+  /**
+   * ============================================================================
+   * Save Minutes
+   * ============================================================================
+   */
+  async saveMinutes(
+
+    meetingId: string,
+
+    minutes: string,
+
+  ) {
+
+    const { data, error } =
+
+      await this.db
+
+        .from("meetings")
+
+        .update({
+
+          minutes,
+
+        })
+
+        .eq("id", meetingId)
+
+        .select()
+
+        .single();
+
+    this.handleError(error);
+
+    return data;
 
   }
 

@@ -1,3 +1,9 @@
+/**
+ * ============================================================================
+ * Create Meeting DTO
+ * ============================================================================
+ */
+
 export interface CreateMeetingDto {
 
   groupId: string;
@@ -6,11 +12,17 @@ export interface CreateMeetingDto {
 
   description?: string;
 
-  location?: string;
+  location: string;
 
   meetingDate: string;
 
 }
+
+/**
+ * ============================================================================
+ * Update Meeting DTO
+ * ============================================================================
+ */
 
 export interface UpdateMeetingDto {
 
@@ -22,61 +34,35 @@ export interface UpdateMeetingDto {
 
   meetingDate?: string;
 
-  status?: 'scheduled' | 'completed' | 'cancelled';
-
   minutes?: string;
 
+  status?: string;
+
 }
+
+/**
+ * ============================================================================
+ * Attendance DTO
+ * ============================================================================
+ */
 
 export interface AttendanceDto {
 
+  meetingId: string;
+
   memberId: string;
 
-  status: 'present' | 'absent' | 'late';
+  status: string;
 
 }
 
-export interface Meeting {
+/**
+ * ============================================================================
+ * Meeting DTO
+ * ============================================================================
+ */
 
-  id: string;
-
-  group_id: string;
-
-  title: string;
-
-  description: string | null;
-
-  location: string | null;
-
-  meeting_date: string;
-
-  status: 'scheduled' | 'completed' | 'cancelled';
-
-  minutes: string | null;
-
-  created_by: string;
-
-  created_at: string;
-
-  updated_at: string;
-
-}
-
-export interface MeetingAttendance {
-
-  id: string;
-
-  meeting_id: string;
-
-  member_id: string;
-
-  status: 'present' | 'absent' | 'late';
-
-  checked_in_at: string | null;
-
-}
-
-export interface MeetingResponseDto {
+export interface MeetingDto {
 
   id: string;
 
@@ -84,18 +70,34 @@ export interface MeetingResponseDto {
 
   title: string;
 
-  description?: string | null;
+  description: string | null;
 
-  location?: string | null;
+  location: string;
 
   meetingDate: string;
 
   status: string;
 
-  minutes?: string | null;
+  minutes: string | null;
 
   createdBy: string;
 
   createdAt: string;
+
+}
+
+/**
+ * ============================================================================
+ * Attendance Record DTO
+ * ============================================================================
+ */
+
+export interface AttendanceRecordDto {
+
+  memberId: string;
+
+  status: string;
+
+  checkedInAt: string | null;
 
 }

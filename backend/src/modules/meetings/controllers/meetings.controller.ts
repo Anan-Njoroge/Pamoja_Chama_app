@@ -1,336 +1,358 @@
+import { Request, Response } from "express";
+
+import { AppError } from "@/shared/errors/AppError";
+import { asyncHandler } from "@/shared/utils/asyncHandler";
 import {
-    Request,
-    Response,
-  } from 'express';
-  
-  import { MeetingsService } from '../services/meetings.service';
-  
-  export class MeetingsController {
-  
-    constructor(
-  
-      private readonly meetingsService =
-        new MeetingsService(),
-  
-    ) {}
-  
-    /**
-     * ============================================================================
-     * Create Meeting
-     * ============================================================================
-     */
-    createMeeting = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meeting =
-  
-        await this.meetingsService.createMeeting(
-  
-          req.user!.id,
-  
-          req.body,
-  
-        );
-  
-      res.status(201).json({
-  
-        success: true,
-  
-        message: 'Meeting created successfully.',
-  
-        data: meeting,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Group Meetings
-     * ============================================================================
-     */
-    getMeetings = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const groupId = String(
-        req.params.groupId,
-      );
-  
-      const meetings =
-  
-        await this.meetingsService.getMeetings(
-          groupId,
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        data: meetings,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Upcoming Meetings
-     * ============================================================================
-     */
-    getUpcomingMeetings = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const groupId = String(
-        req.params.groupId,
-      );
-  
-      const meetings =
-  
-        await this.meetingsService.getUpcomingMeetings(
-          groupId,
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        data: meetings,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Get Meeting
-     * ============================================================================
-     */
-    getMeeting = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const meeting =
-  
-        await this.meetingsService.getMeeting(
-          meetingId,
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        data: meeting,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Update Meeting
-     * ============================================================================
-     */
-    updateMeeting = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const meeting =
-  
-        await this.meetingsService.updateMeeting(
-  
-          meetingId,
-  
-          req.body,
-  
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        message: 'Meeting updated successfully.',
-  
-        data: meeting,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Cancel Meeting
-     * ============================================================================
-     */
-    cancelMeeting = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const meeting =
-  
-        await this.meetingsService.cancelMeeting(
-          meetingId,
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        message: 'Meeting cancelled.',
-  
-        data: meeting,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Complete Meeting
-     * ============================================================================
-     */
-    completeMeeting = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const meeting =
-  
-        await this.meetingsService.completeMeeting(
-  
-          meetingId,
-  
-          req.body.minutes,
-  
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        message: 'Meeting completed.',
-  
-        data: meeting,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Record Attendance
-     * ============================================================================
-     */
-    recordAttendance = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const attendance =
-  
-        await this.meetingsService.recordAttendance(
-  
-          meetingId,
-  
-          req.body,
-  
-        );
-  
-      res.status(201).json({
-  
-        success: true,
-  
-        message: 'Attendance recorded.',
-  
-        data: attendance,
-  
-      });
-  
-    };
-  
-    /**
-     * ============================================================================
-     * Attendance List
-     * ============================================================================
-     */
-    getAttendance = async (
-  
-      req: Request,
-  
-      res: Response,
-  
-    ) => {
-  
-      const meetingId = String(
-        req.params.id,
-      );
-  
-      const attendance =
-  
-        await this.meetingsService.getAttendance(
-          meetingId,
-        );
-  
-      res.json({
-  
-        success: true,
-  
-        data: attendance,
-  
-      });
-  
-    };
-  
+  success,
+  created,
+} from "@/shared/utils/apiResponse";
+
+import { MeetingsService } from "../services/meetings.service";
+
+const meetingsService =
+  new MeetingsService();
+
+const param = (
+
+  value: string | string[] | undefined,
+
+): string => {
+
+  if (!value) {
+
+    throw new AppError(
+
+      "Missing parameter.",
+
+      400,
+
+    );
+
   }
+
+  return Array.isArray(value)
+
+    ? value[0]
+
+    : value;
+
+};
+
+export const createMeeting =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      if (!req.user) {
+
+        throw new AppError(
+
+          "Unauthorized.",
+
+          401,
+
+        );
+
+      }
+
+      const meeting =
+
+        await meetingsService.createMeeting(
+
+          req.user.id,
+
+          req.body,
+
+        );
+
+      return created(
+
+        res,
+
+        meeting,
+
+        "Meeting created successfully.",
+
+      );
+
+    },
+
+  );
+
+export const updateMeeting =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const meeting =
+
+        await meetingsService.updateMeeting(
+
+          param(req.params.id),
+
+          req.body,
+
+        );
+
+      return success(
+
+        res,
+
+        meeting,
+
+      );
+
+    },
+
+  );
+
+export const getMeeting =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const meeting =
+
+        await meetingsService.getMeeting(
+
+          param(req.params.id),
+
+        );
+
+      return success(
+
+        res,
+
+        meeting,
+
+      );
+
+    },
+
+  );
+
+export const getGroupMeetings =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const meetings =
+
+        await meetingsService.getGroupMeetings(
+
+          param(
+
+            req.params.groupId,
+
+          ),
+
+        );
+
+      return success(
+
+        res,
+
+        meetings,
+
+      );
+
+    },
+
+  );
+
+export const deleteMeeting =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const result =
+
+        await meetingsService.deleteMeeting(
+
+          param(req.params.id),
+
+        );
+
+      return success(
+
+        res,
+
+        result,
+
+        result.message,
+
+      );
+
+    },
+
+  );
+
+  /**
+ * ============================================================================
+ * Attendance
+ * ============================================================================
+ */
+
+export const recordAttendance =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const attendance =
+
+        await meetingsService.recordAttendance(
+
+          req.body,
+
+        );
+
+      return created(
+
+        res,
+
+        attendance,
+
+        "Attendance recorded successfully.",
+
+      );
+
+    },
+
+  );
+
+export const updateAttendance =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const attendance =
+
+        await meetingsService.updateAttendance(
+
+          req.body,
+
+        );
+
+      return success(
+
+        res,
+
+        attendance,
+
+      );
+
+    },
+
+  );
+
+export const getAttendance =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const attendance =
+
+        await meetingsService.getAttendance(
+
+          param(req.params.id),
+
+        );
+
+      return success(
+
+        res,
+
+        attendance,
+
+      );
+
+    },
+
+  );
+
+/**
+ * ============================================================================
+ * Minutes
+ * ============================================================================
+ */
+
+export const saveMinutes =
+  asyncHandler(
+
+    async (
+
+      req: Request,
+
+      res: Response,
+
+    ) => {
+
+      const meeting =
+
+        await meetingsService.saveMinutes(
+
+          param(req.params.id),
+
+          req.body.minutes,
+
+        );
+
+      return success(
+
+        res,
+
+        meeting,
+
+      );
+
+    },
+
+  );

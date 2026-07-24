@@ -1,83 +1,129 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import { MeetingsController } from '../controllers/meetings.controller';
+import { authMiddleware } from "@/middleware/auth.middleware";
 
-import { authMiddleware } from '@/middleware/auth.middleware';
+import {
 
-import { treasurerMiddleware } from '@/middleware/treasurer.middleware';
+  createMeeting,
+  deleteMeeting,
+  getAttendance,
+  getGroupMeetings,
+  getMeeting,
+  recordAttendance,
+  saveMinutes,
+  updateAttendance,
+  updateMeeting,
+
+} from "../controllers/meetings.controller";
 
 const router = Router();
 
-const controller = new MeetingsController();
-
-/*
-|--------------------------------------------------------------------------
-| All meeting routes require authentication
-|--------------------------------------------------------------------------
-*/
-
-router.use(authMiddleware);
-
-/*
-|--------------------------------------------------------------------------
-| Read
-|--------------------------------------------------------------------------
-*/
-
-router.get(
-  '/group/:groupId',
-  controller.getMeetings,
-);
-
-router.get(
-  '/group/:groupId/upcoming',
-  controller.getUpcomingMeetings,
-);
-
-router.get(
-  '/:id',
-  controller.getMeeting,
-);
-
-router.get(
-  '/:id/attendance',
-  controller.getAttendance,
-);
-
-/*
-|--------------------------------------------------------------------------
-| Treasurer
-|--------------------------------------------------------------------------
-*/
+/**
+ * ============================================================================
+ * Meetings
+ * ============================================================================
+ */
 
 router.post(
-  '/',
-  treasurerMiddleware,
-  controller.createMeeting,
+
+  "/",
+
+  authMiddleware,
+
+  createMeeting,
+
 );
 
-router.patch(
-  '/:id',
-  treasurerMiddleware,
-  controller.updateMeeting,
+router.get(
+
+  "/group/:groupId",
+
+  authMiddleware,
+
+  getGroupMeetings,
+
 );
 
-router.patch(
-  '/:id/cancel',
-  treasurerMiddleware,
-  controller.cancelMeeting,
+router.get(
+
+  "/:id",
+
+  authMiddleware,
+
+  getMeeting,
+
 );
 
-router.patch(
-  '/:id/complete',
-  treasurerMiddleware,
-  controller.completeMeeting,
+router.put(
+
+  "/:id",
+
+  authMiddleware,
+
+  updateMeeting,
+
+);
+
+router.delete(
+
+  "/:id",
+
+  authMiddleware,
+
+  deleteMeeting,
+
+);
+
+/**
+ * ============================================================================
+ * Attendance
+ * ============================================================================
+ */
+
+router.get(
+
+  "/:id/attendance",
+
+  authMiddleware,
+
+  getAttendance,
+
 );
 
 router.post(
-  '/:id/attendance',
-  treasurerMiddleware,
-  controller.recordAttendance,
+
+  "/attendance",
+
+  authMiddleware,
+
+  recordAttendance,
+
+);
+
+router.put(
+
+  "/attendance",
+
+  authMiddleware,
+
+  updateAttendance,
+
+);
+
+/**
+ * ============================================================================
+ * Minutes
+ * ============================================================================
+ */
+
+router.put(
+
+  "/:id/minutes",
+
+  authMiddleware,
+
+  saveMinutes,
+
 );
 
 export default router;

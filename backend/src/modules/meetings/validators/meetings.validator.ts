@@ -1,55 +1,33 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const createMeetingSchema = z.object({
 
-  groupId: z.uuid(),
+  groupId: z.string().uuid(),
 
-  title: z.string().min(3).max(100),
+  title: z.string().min(3),
 
   description: z.string().optional(),
 
-  location: z.string().optional(),
+  location: z.string().min(2),
 
-  meetingDate: z.iso.datetime(),
+  meetingDate: z.string(),
 
 });
+
+export const updateMeetingSchema = createMeetingSchema.partial();
 
 export const attendanceSchema = z.object({
 
-  memberId: z.uuid(),
+  meetingId: z.string().uuid(),
 
-  status: z.enum([
+  memberId: z.string().uuid(),
 
-    'present',
-
-    'absent',
-
-    'late',
-
-  ]),
+  status: z.string(),
 
 });
 
-export const updateMeetingSchema = z.object({
+export const minutesSchema = z.object({
 
-  title: z.string().min(3).max(100).optional(),
-
-  description: z.string().optional(),
-
-  location: z.string().optional(),
-
-  meetingDate: z.iso.datetime().optional(),
-
-  status: z.enum([
-
-    'scheduled',
-
-    'completed',
-
-    'cancelled',
-
-  ]).optional(),
-
-  minutes: z.string().optional(),
+  minutes: z.string().min(5),
 
 });

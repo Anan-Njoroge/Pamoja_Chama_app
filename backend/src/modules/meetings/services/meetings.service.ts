@@ -1,16 +1,17 @@
-import { AppError } from '@/shared/errors/AppError';
+import { AppError } from "@/shared/errors/AppError";
 
-import { MeetingsRepository } from '../repositories/meetings.repository';
+import {
+  toAttendanceDto,
+  toMeetingDto,
+} from "../mappers/meetings.mapper";
 
-import { toMeetingDto } from '../mappers/meetings.mapper';
+import { MeetingsRepository } from "../repositories/meetings.repository";
 
 import {
   AttendanceDto,
   CreateMeetingDto,
   UpdateMeetingDto,
-} from '../types/meetings.types';
-
-import { NotificationsService } from '@/modules/notifications/services/notifications.service';
+} from "../types/meetings.types";
 
 export class MeetingsService {
 
@@ -18,9 +19,6 @@ export class MeetingsService {
 
     private readonly repository =
       new MeetingsRepository(),
-
-    private readonly notifications =
-      new NotificationsService(),
 
   ) {}
 
@@ -31,98 +29,26 @@ export class MeetingsService {
    */
   async createMeeting(
 
-    creatorId: string,
+    createdBy: string,
 
     dto: CreateMeetingDto,
 
   ) {
 
     const meeting =
+
       await this.repository.createMeeting(
 
-        creatorId,
+        createdBy,
 
         dto,
 
       );
 
-    /**
-     * Notify every member.
-     */
-    await this.notifications.createGroupNotification(
-
-      dto.groupId,
-
-      'meeting_created',
-
-      'New Meeting Scheduled',
-
-      `${dto.title} has been scheduled.`,
-
-    );
-
     return toMeetingDto(
+
       meeting,
-    );
 
-  }
-
-  /**
-   * ============================================================================
-   * Get Meeting
-   * ============================================================================
-   */
-  async getMeeting(
-    meetingId: string,
-  ) {
-
-    const meeting =
-      await this.repository.findById(
-        meetingId,
-      );
-
-    return toMeetingDto(
-      meeting,
-    );
-
-  }
-
-  /**
-   * ============================================================================
-   * Group Meetings
-   * ============================================================================
-   */
-  async getMeetings(
-    groupId: string,
-  ) {
-
-    const meetings =
-      await this.repository.findByGroup(
-        groupId,
-      );
-
-    return meetings.map(
-      toMeetingDto,
-    );
-
-  }
-
-  /**
-   * ============================================================================
-   * Upcoming Meetings
-   * ============================================================================
-   */
-  async getUpcomingMeetings(
-    groupId: string,
-  ) {
-
-    const meetings =
-      await this.repository.findUpcoming(
-        groupId,
-      );
-
-    return meetings.map(
-      toMeetingDto,
     );
 
   }
@@ -141,25 +67,27 @@ export class MeetingsService {
   ) {
 
     const meeting =
+
       await this.repository.findById(
+
         meetingId,
+
       );
 
-    if (
-      meeting.status === 'cancelled'
-    ) {
+    if (!meeting) {
 
       throw new AppError(
 
-        'Cancelled meetings cannot be updated.',
+        "Meeting not found.",
 
-        400,
+        404,
 
       );
 
     }
 
     const updated =
+
       await this.repository.updateMeeting(
 
         meetingId,
@@ -169,159 +97,174 @@ export class MeetingsService {
       );
 
     return toMeetingDto(
+
       updated,
+
     );
 
   }
 
   /**
    * ============================================================================
-   * Cancel Meeting
+   * Get Meeting
    * ============================================================================
    */
-  async cancelMeeting(
+  async getMeeting(
+
     meetingId: string,
+
   ) {
 
     const meeting =
+
       await this.repository.findById(
+
         meetingId,
+
       );
 
-    if (
-      meeting.status === 'completed'
-    ) {
+    if (!meeting) {
 
       throw new AppError(
 
-        'Completed meetings cannot be cancelled.',
+        "Meeting not found.",
 
-        400,
+        404,
 
       );
 
     }
 
-    const updated =
-      await this.repository.updateMeeting(
-
-        meetingId,
-
-        {
-
-          status: 'cancelled',
-
-        },
-
-      );
-
-    /**
-     * Notify group members.
-     */
-    await this.notifications.createGroupNotification(
-
-      updated.group_id,
-
-      'meeting_cancelled',
-
-      'Meeting Cancelled',
-
-      `${updated.title} has been cancelled.`,
-
-    );
-
     return toMeetingDto(
-      updated,
+
+      meeting,
+
     );
 
   }
 
   /**
    * ============================================================================
-   * Complete Meeting
+   * Group Meetings
    * ============================================================================
    */
-  async completeMeeting(
+  async getGroupMeetings(
 
-    meetingId: string,
-
-    minutes?: string,
+    groupId: string,
 
   ) {
 
-    const updated =
-      await this.repository.updateMeeting(
+    const meetings =
 
-        meetingId,
+      await this.repository.findGroupMeetings(
 
-        {
-
-          status: 'completed',
-
-          minutes,
-
-        },
+        groupId,
 
       );
 
-    /**
-     * Notify group members.
-     */
-    await this.notifications.createGroupNotification(
+    return meetings.map(
 
-      updated.group_id,
+      toMeetingDto,
 
-      'meeting_completed',
-
-      'Meeting Completed',
-
-      `${updated.title} has been completed.`,
-
-    );
-
-    return toMeetingDto(
-      updated,
     );
 
   }
 
   /**
    * ============================================================================
-   * Record Attendance
+   * Delete Meeting
+   * ============================================================================
+   */
+  async deleteMeeting(
+
+    meetingId: string,
+
+  ) {
+
+    await this.repository.deleteMeeting(
+
+      meetingId,
+
+    );
+
+    return {
+
+      success: true,
+
+      message:
+
+        "Meeting deleted successfully.",
+
+    };
+
+  }
+
+  /**
+   * ============================================================================
+   * Attendance
    * ============================================================================
    */
   async recordAttendance(
-
-    meetingId: string,
 
     dto: AttendanceDto,
 
   ) {
 
-    const meeting =
-      await this.repository.findById(
+    const attendance =
+
+      await this.repository.recordAttendance(
+
+        dto,
+
+      );
+
+    return toAttendanceDto(
+
+      attendance,
+
+    );
+
+  }
+
+  async updateAttendance(
+
+    dto: AttendanceDto,
+
+  ) {
+
+    const attendance =
+
+      await this.repository.updateAttendance(
+
+        dto,
+
+      );
+
+    return toAttendanceDto(
+
+      attendance,
+
+    );
+
+  }
+
+  async getAttendance(
+
+    meetingId: string,
+
+  ) {
+
+    const attendance =
+
+      await this.repository.getAttendance(
+
         meetingId,
-      );
-
-    if (
-      meeting.status === 'cancelled'
-    ) {
-
-      throw new AppError(
-
-        'Attendance cannot be recorded for a cancelled meeting.',
-
-        400,
 
       );
 
-    }
+    return attendance.map(
 
-    return this.repository.recordAttendance(
-
-      meetingId,
-
-      dto,
+      toAttendanceDto,
 
     );
 
@@ -329,15 +272,31 @@ export class MeetingsService {
 
   /**
    * ============================================================================
-   * Attendance List
+   * Minutes
    * ============================================================================
    */
-  async getAttendance(
+  async saveMinutes(
+
     meetingId: string,
+
+    minutes: string,
+
   ) {
 
-    return this.repository.getAttendance(
-      meetingId,
+    const meeting =
+
+      await this.repository.saveMinutes(
+
+        meetingId,
+
+        minutes,
+
+      );
+
+    return toMeetingDto(
+
+      meeting,
+
     );
 
   }
