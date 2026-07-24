@@ -6,6 +6,7 @@
     "@expo-google-fonts/dm-sans": "^0.4.2",
     "@expo/ui": "~57.0.4",
     "@supabase/supabase-js": "^2.110.7",
+    "bcrypt": "^6.0.0",
     "expo": "~57.0.4",
     "expo-blur": "~57.0.0",
     "expo-constants": "~57.0.3",
@@ -22,6 +23,7 @@
     "expo-symbols": "~57.0.0",
     "expo-system-ui": "~57.0.0",
     "expo-web-browser": "~57.0.0",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react-native": "^1.23.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -35,6 +37,8 @@
     "react-native-worklets": "0.10.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "~19.2.2",
     "typescript": "~6.0.3"
   },
